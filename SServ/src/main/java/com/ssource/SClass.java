@@ -37,7 +37,10 @@ public class SClass{
      * @return
      */
     public static String timeMillis(){
-        return String.valueOf(System.currentTimeMillis()/1000);
+        return String.valueOf(timeMillisLong());
+    }
+    public static Long timeMillisLong(){
+        return System.currentTimeMillis()/1000;
     }
 
     /**

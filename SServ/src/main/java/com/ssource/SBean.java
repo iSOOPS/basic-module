@@ -23,7 +23,7 @@ public class SBean {
     private static Logger logger = LogManager.getLogger(SBean.class.getName());
 
 
-    public static <T>T mapToBean(Map<String, Object> map, Class<T> t) {
+    public static <T>T mapToBean(Map map, Class<T> t) {
         if (map == null || t == null) {
             return null;
         }
@@ -52,22 +52,7 @@ public class SBean {
         return result;
     }
 
-
-    public static void mapStringToBean(Map<String, String> map, Object obj) {
-        if (map == null || obj == null) {
-            return;
-        }
-        try {
-            BeanUtils.populate(obj, map);
-        } catch (Exception e) {
-            logger.error("***** mapToBean Error *****");
-            logger.error("Exception="+e);
-        }
-    }
-
-
-
-    public static Map<String, Object> beanToMap(Object obj) {
+    public static Map beanToMap(Object obj) {
         if(obj == null){
             return null;
         }
@@ -92,37 +77,6 @@ public class SBean {
         return map;
     }
 
-
-
-    public static Map<String, String> beanToMapString(Object obj) {
-        if(obj == null){
-            return null;
-        }
-        Map<String, String> map = new HashMap<String, String>();
-        try {
-            BeanInfo beanInfo = Introspector.getBeanInfo(obj.getClass());
-            PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
-            for (PropertyDescriptor property : propertyDescriptors) {
-                String key = property.getName();
-                // 过滤class属性
-                if (!key.equals("class")) {
-                    // 得到property对应的getter方法
-                    Method getter = property.getReadMethod();
-                    Object value = getter.invoke(obj);
-                    String valueString = "";
-                    if (value instanceof String){
-                        valueString = (String) value;
-                    }
-                    map.put(key, valueString);
-                }
-            }
-        } catch (Exception e) {
-            logger.error("***** beanToMap Error *****");
-            logger.error("Exception="+e);
-        }
-        return map;
-    }
-
     public static <T>T beanToBean(Object bean, Class<T> t){
         if (bean == null){
             return null;
@@ -130,18 +84,12 @@ public class SBean {
         T newBean = null;
         try {
             newBean = t.newInstance();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
         try {
             PropertyUtils.copyProperties(newBean,bean);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
         }
         return newBean;
