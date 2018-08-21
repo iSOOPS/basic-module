@@ -115,8 +115,9 @@ public class SFile {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        boolean isOk = SFile.creatDir(path+"/bufferUploadImage/");
-        if (isOk == false){
+
+        boolean isOk = SFile.creatDir(path);
+        if (!isOk){
             return null;
         }
         File imageFile = null;
@@ -152,5 +153,12 @@ public class SFile {
         inStream.close();
         //把outStream里的数据写入内存
         return outStream.toByteArray();
+    }
+
+    private static String getLocalPath(String path){
+        if (path.endsWith("/")) {
+            path = path.substring(0,path.length() - 1);
+        }
+        return path;
     }
 }

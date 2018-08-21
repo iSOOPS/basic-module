@@ -72,9 +72,9 @@ public class SRedis {
         {
             // 池基本配置
             JedisPoolConfig config = new JedisPoolConfig();
-            config.setMaxTotal(20);
-            config.setMaxIdle(5);
-            config.setMaxWaitMillis(1000l);
+            config.setMaxTotal(200);
+            config.setMaxIdle(10);
+            config.setMaxWaitMillis(10000);
             config.setTestOnBorrow(false);
             jedisPool = new JedisPool(config, getIp(), GLOBALSINGLETON.S().REDIS_PORT);
         }
