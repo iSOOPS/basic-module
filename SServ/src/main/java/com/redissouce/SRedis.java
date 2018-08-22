@@ -1,6 +1,7 @@
 package com.redissouce;
 
 import com.GLOBALSINGLETON;
+import com.alibaba.fastjson.JSON;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import redis.clients.jedis.*;
@@ -13,30 +14,14 @@ import java.util.List;
  * Created by Samuel on 16/8/1.
  */
 public class SRedis {
-    /**
-     * 单例
-     */
-    private static SRedis sRedis;
 
-    /**
-     * 非切片链接池
-     */
-    private JedisPool jedisPool;
-    /**
-     * 切片链接池
-     */
-    private ShardedJedisPool shardedJedisPool;
-    /**
-     * log记录
-     */
+    //非切片链接池
+    private static JedisPool jedisPool;
+    //切片链接池
+    private static ShardedJedisPool shardedJedisPool;
+
     static Logger logger = LogManager.getLogger(SRedis.class.getName());
-//    /** * 非切片客户端链接 */
-//    private Jedis jedis;
-//    /** * 切片客户端链接 */
-//    private ShardedJedis shardedJedis;
-    /**
-    * 获取 ip
-    * */
+
     private static String getIp() {
         if (GLOBALSINGLETON.S().ENVIRONMENT == GLOBALSINGLETON.ENVIRONMENTENUM.RELASE){
             return GLOBALSINGLETON.S().REDIS_PUBLIC_HOST;
@@ -47,205 +32,161 @@ public class SRedis {
         return GLOBALSINGLETON.S().REDIS_TEST_HOST;
     }
 
-    private SRedis(){
-    }
-    public static SRedis s(){
-        if(sRedis==null){
-            sRedis=new SRedis();
-            sRedis.jedisPool = sRedis.initialPool();
-            sRedis.shardedJedisPool = sRedis.initialShardedPool();
-//            sRedis.show();
-        }
-        return sRedis;
-    }
-
-    public void clearSelf(){
-        this.sRedis = null;
+    private static JedisPoolConfig initialConfig(){
+        // 池基本配置
+        JedisPoolConfig config = new JedisPoolConfig();
+        config.setMaxTotal(500);
+        config.setMaxIdle(20);
+        config.setMaxWaitMillis(10000);
+        config.setTestOnBorrow(false);
+        config.setTestOnReturn(true);
+        return config;
     }
 
-    /**
-     * 初始化切片池
-     */
-    private JedisPool initialPool() {
-        logger.warn("initialPool");
-        if (jedisPool==null)
-        {
-            // 池基本配置
-            JedisPoolConfig config = new JedisPoolConfig();
-            config.setMaxTotal(200);
-            config.setMaxIdle(10);
-            config.setMaxWaitMillis(10000);
-            config.setTestOnBorrow(false);
-            jedisPool = new JedisPool(config, getIp(), GLOBALSINGLETON.S().REDIS_PORT);
+    //初始化切片池 在多线程环境同步初始化
+    private static synchronized JedisPool initialPool() {
+        if (jedisPool==null) {
+            jedisPool = new JedisPool(initialConfig(), getIp(), GLOBALSINGLETON.S().REDIS_PORT);
         }
         return jedisPool;
     }
-    private ShardedJedisPool initialShardedPool() {
-        logger.warn("initialShardedPool");
-        if (shardedJedisPool==null)
-        {
-            // 池基本配置
-            JedisPoolConfig config = new JedisPoolConfig();
-            config.setMaxTotal(200);
-            config.setMaxIdle(10);
-            config.setMaxWaitMillis(10000);
-            config.setTestOnBorrow(false);
+
+    private static synchronized ShardedJedisPool initialShardedPool() {
+        if (shardedJedisPool==null) {
             // slave链接
-            List<JedisShardInfo> shards = new ArrayList<JedisShardInfo>();
+            List<JedisShardInfo> shards = new ArrayList<>();
             shards.add(new JedisShardInfo(getIp(), GLOBALSINGLETON.S().REDIS_PORT, "master"));
+            if (GLOBALSINGLETON.S().REDIS_POOL_SLAVES!=null){
+                for (String ip:GLOBALSINGLETON.S().REDIS_POOL_SLAVES){
+                    shards.add(new JedisShardInfo(ip, GLOBALSINGLETON.S().REDIS_PORT, "slaver_"+ip));
+                }
+            }
             // 构造池
-            shardedJedisPool = new ShardedJedisPool(config, shards);
+            shardedJedisPool = new ShardedJedisPool(initialConfig(), shards);
         }
         return shardedJedisPool;
     }
 
-    private synchronized Jedis getJedis() {
+    private synchronized static Jedis getJedis() {
+        Jedis jedis = null;
         try {
-            if (this.jedisPool != null) {
-                Jedis jedis = this.jedisPool.getResource();
-                return jedis;
+            jedisPool = initialPool();
+            if (null != jedisPool) {
+                jedis = jedisPool.getResource();
             }
-            return null;
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            logger.error("Get jedis error : " + e);
         }
+        return jedis;
     }
 
-    private synchronized ShardedJedis getShardedJedis() {
+    private synchronized static ShardedJedis getShardedJedis() {
+        ShardedJedis shardedJedis = null;
         try {
-            if (this.shardedJedisPool != null) {
-                ShardedJedis shardedJedis = this.shardedJedisPool.getResource();
-                return shardedJedis;
+            shardedJedisPool = initialShardedPool();
+            if (shardedJedisPool != null) {
+                shardedJedis = shardedJedisPool.getResource();
             }
-            return null;
         } catch (Exception e) {
-            logger.warn("getShardedJedis error:"+e);
-            e.printStackTrace();
-            return null;
+            logger.error("Get jedis error : " + e);
         }
+        return shardedJedis;
     }
 
 
-    public boolean cleanAll(){
+    public synchronized static <T> RedisBean<T> set(String key, T obj) {
+        if (key == null || key.equals("") || obj == null){
+            return new RedisBean<>(false);
+        }
+        String status = "";
+        String json = (obj instanceof String) ? (String) obj : JSON.toJSONString(obj);
         try {
-            Jedis jedis = this.getJedis();
-            String stats = jedis.flushDB();
+            Jedis jedis = getJedis();
+            status = jedis.set(key,json);
             jedis.close();
-            return stats.equals("OK");
-        }catch (Exception e){
-            e.printStackTrace();
-            return false;
         }
+        catch (Exception e) {
+            logger.error("Set key error : " + e);
+        }
+        return new RedisBean<>(status.equals("OK"));
     }
 
-    /**
-     * 缓存string 用于类似商品详情的map,不需要修改,转成json后存储 有过期时间
-     * @param stringName
-     * @param value
-     * @return
-     */
-    public boolean setStringToRedis(String stringName,String value) {
-        try {
-            String stats = "";
-            ShardedJedis shardedJedis = this.getShardedJedis();
-            if (shardedJedis!=null){
-                stats = shardedJedis.set(stringName, value);
-                return stats.equals("OK");
-            }
-            else {
-                Jedis jedis = this.getJedis();
-                if (jedis!=null){
-                    stats = jedis.set(stringName, value);
-                    jedis.close();
-                }
-            }
-            shardedJedis.close();
-            return stats.equals("OK");
-        }catch (Exception e){
-            logger.warn("setStringToRedis error:"+e);
-            logger.warn("setStringToRedis stringName="+stringName);
-            logger.warn("setStringToRedis value="+value);
-            clearSelf();
-            return false;
+    public synchronized static <T> RedisBean<T> set(String key, T obj ,Integer seconds) {
+        if (key == null || key.equals("") || obj == null || seconds == null){
+            return new RedisBean<>(false);
         }
-    }
-    public boolean setStringToRedisbyTime(String stringName,String value,Integer second){
+        String status = "";
+        String json = (obj instanceof String) ? (String) obj : JSON.toJSONString(obj);
         try {
-            String stats = "";
-            ShardedJedis shardedJedis = this.getShardedJedis();
-            if (shardedJedis!=null){
-                stats = shardedJedis.setex(stringName,second, value);
-                return stats.equals("OK");
-            }
-            else {
-                Jedis jedis = this.getJedis();
-                if (jedis!=null){
-                    stats = jedis.setex(stringName,second, value);
-                    jedis.close();
-                }
-            }
-            shardedJedis.close();
-            return stats.equals("OK");
-        }catch (Exception e){
-            logger.warn("setStringToRedisbyTime error:"+e);
-            clearSelf();
-            return false;
+            Jedis jedis = getJedis();
+            status = jedis.set(key,json);
+            jedis.expire(key, seconds);
+            jedis.close();
         }
+        catch (Exception e) {
+            logger.error("Set key error : " + e);
+        }
+        return new RedisBean<>(status.equals("OK"));
     }
 
-    public String getStringFromRedis(String stringName){
+    public synchronized static <T> RedisBean<T> get(String key, Class<T> tClass){
+        if (key == null || key.equals("")){
+            return new RedisBean<>(false);
+        }
+        RedisBean bean = new RedisBean(false);
         try {
-            ShardedJedis shardedJedis = this.getShardedJedis();
-            if (shardedJedis!=null && shardedJedis.exists(stringName)){
-                String string = shardedJedis.get(stringName);
-                shardedJedis.close();
-                return string;
+            Jedis jedis = getJedis();
+            String json = jedis.get(key);
+            jedis.close();
+            if (tClass == String.class){
+                bean.setObject(json);
             }
             else {
-                Jedis jedis = this.getJedis();
-                if (jedis!=null){
-                    String string = jedis.get(stringName);
-                    jedis.close();
-                    return string;
-                }
+                T obj = JSON.parseObject(json,tClass);
+                bean.setObject(obj);
             }
-            shardedJedis.close();
-            return null;
-        }catch (Exception e){
-            logger.warn("getStringFromRedis error:"+e);
-            logger.warn("getStringFromRedis stringName="+stringName);
-            clearSelf();
-            return null;
         }
-
+        catch (Exception e) {
+            logger.error("Get key error : " + e);
+        }
+        bean.changStatus(bean.getObject() != null);
+        return bean;
     }
-    public boolean deleteStringFromRedis(String stringName){
+
+    public synchronized static <T> RedisBean<List<T>> getList(String key, Class<T> tClass){
+        if (key == null || key.equals("")){
+            return new RedisBean<>(false);
+        }
+        RedisBean bean = new RedisBean(false);
         try {
-            ShardedJedis shardedJedis = this.getShardedJedis();
-            if (shardedJedis!=null && shardedJedis.exists(stringName)){
-                Long stats = shardedJedis.del(stringName);
-                shardedJedis.close();
-                return stats > 0;
-            }
-            else {
-                Jedis jedis = this.getJedis();
-                if (jedis!=null){
-                    Long stats = jedis.del(stringName);
-                    jedis.close();
-                    return stats > 0;
-                }
-            }
-            shardedJedis.close();
-            return true;
-        }catch (Exception e){
-            logger.warn("deleteStringFromRedis error:"+e);
-            logger.warn("deleteStringFromRedis stringName="+stringName);
-            clearSelf();
-            return false;
+            Jedis jedis = getJedis();
+            String json = jedis.get(key);
+            jedis.close();
+            List<T> obj = JSON.parseArray(json,tClass);
+            bean.setObject(obj);
         }
+        catch (Exception e) {
+            logger.error("GetList key error : " + e);
+        }
+        bean.changStatus(bean.getObject() != null);
+        return bean;
     }
 
+    public synchronized static RedisBean delete(String key) {
+        if (key == null || key.equals("")){
+            return new RedisBean<>(false);
+        }
+        Long status = 0L;
+        try {
+            Jedis jedis = getJedis();
+            status = jedis.del(key);
+            jedis.close();
+        }
+        catch (Exception e) {
+            logger.error("Delete key error : " + e);
+        }
+        return new RedisBean<>(status>0);
+    }
 
 //    public void show() {
 //        // key检测

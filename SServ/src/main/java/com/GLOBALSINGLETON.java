@@ -22,8 +22,8 @@ public class GLOBALSINGLETON {
     public String REDIS_DEVELOP_HOST;
     public String REDIS_TEST_HOST;
     public String REDIS_PUBLIC_HOST;
-
     public Integer REDIS_PORT;
+    public List<String> REDIS_POOL_SLAVES;
 
     //单例
     private static GLOBALSINGLETON globalsingleton;
