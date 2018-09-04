@@ -16,17 +16,17 @@
       <file leaf-file-name="pom.xml" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pom.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="300">
-              <caret line="20" lean-forward="true" selection-start-line="20" selection-end-line="20" />
+            <state relative-caret-position="240">
+              <caret line="16" column="70" lean-forward="true" selection-start-line="16" selection-start-column="70" selection-end-line="16" selection-end-column="70" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SRedis.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/redissouce/SRedis.java">
+      <file leaf-file-name="SClass.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/ssource/SClass.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="146">
-              <caret line="138" column="41" selection-start-line="138" selection-start-column="41" selection-end-line="138" selection-end-column="41" />
+            <state relative-caret-position="120">
+              <caret line="148" column="16" selection-start-line="148" selection-start-column="16" selection-end-line="148" selection-end-column="16" />
             </state>
           </provider>
         </entry>
@@ -34,8 +34,11 @@
       <file leaf-file-name="MainTest.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/MainTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="456">
-              <caret line="42" lean-forward="true" selection-start-line="42" selection-end-line="42" />
+            <state relative-caret-position="645">
+              <caret line="47" column="27" selection-start-line="46" selection-start-column="30" selection-end-line="47" selection-end-column="27" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -65,6 +68,8 @@
       <find>clearSelf</find>
       <find>setStringToRedisbyTime</find>
       <find>jedis</find>
+      <find>size</find>
+      <find>random</find>
     </findStrings>
   </component>
   <component name="IdeDocumentHistory">
@@ -74,16 +79,16 @@
         <option value="$PROJECT_DIR$/src/main/java/com/redisRoom/redisBean/RequestClientBean.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/elasticsearchRoom/SEEConf.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/RoomConfig.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/ssource/SClass.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/ssource/SBean.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/ssource/SHttp.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/ssource/SFile.java" />
-        <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/src/main/java/com/GLOBALSINGLETON.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/MainTestController.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/redissouce/redisBean/RedisBean.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/redissouce/SRedis.java" />
+        <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/src/main/java/com/MainTest.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/ssource/SClass.java" />
       </list>
     </option>
   </component>
@@ -120,8 +125,8 @@
     <packageJsonPaths />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="1297" />
-    <option name="y" value="-257" />
+    <option name="x" value="1280" />
+    <option name="y" value="-159" />
     <option name="width" value="1903" />
     <option name="height" value="1057" />
   </component>
@@ -130,8 +135,9 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="AndroidView" />
+      <pane id="Scope" />
       <pane id="PackagesPane" />
+      <pane id="AndroidView" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -147,34 +153,12 @@
             <path>
               <item name="SServ" type="b2602c69:ProjectViewProjectNode" />
               <item name="SServ" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="SServ" type="b2602c69:ProjectViewProjectNode" />
-              <item name="SServ" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="SServ" type="b2602c69:ProjectViewProjectNode" />
-              <item name="SServ" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="com" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="SServ" type="b2602c69:ProjectViewProjectNode" />
-              <item name="SServ" type="462c0819:PsiDirectoryNode" />
               <item name="target" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -358,15 +342,19 @@
       <workItem from="1534726828535" duration="9358000" />
       <workItem from="1534763432122" duration="319000" />
       <workItem from="1534816648640" duration="3113000" />
-      <workItem from="1534832974129" duration="11859000" />
+      <workItem from="1534832974129" duration="11909000" />
+      <workItem from="1535089235194" duration="639000" />
+      <workItem from="1535339118436" duration="1103000" />
+      <workItem from="1535427477353" duration="4751000" />
+      <workItem from="1535505491833" duration="1940000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="32519000" />
+    <option name="totallyTimeSpent" value="41002000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1297" y="-257" width="1903" height="1057" extended-state="0" />
+    <frame x="1280" y="-159" width="1903" height="1057" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
@@ -381,16 +369,15 @@
       <window_info id="UI Designer" order="3" />
       <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.5465787" weight="0.328125" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32842416" />
-      <window_info anchor="bottom" id="Messages" order="12" sideWeight="0.4674361" weight="0.446875" />
       <window_info id="Palette&#9;" order="6" />
       <window_info id="Image Layers" order="7" />
       <window_info anchor="bottom" id="Java Enterprise" order="9" sideWeight="0.49675852" weight="0.3298969" />
       <window_info anchor="right" id="Capture Analysis" order="7" />
-      <window_info anchor="bottom" x="4" y="287" width="1276" height="249" id="Run" order="2" sideWeight="0.7301459" visible="true" weight="0.34895834" />
       <window_info anchor="bottom" id="Version Control" order="13" show_stripe_button="false" sideWeight="0.49675852" weight="0.329927" />
+      <window_info anchor="bottom" x="4" y="287" width="1276" height="249" id="Run" order="2" sideWeight="0.7301459" weight="0.34895834" />
       <window_info anchor="bottom" id="Spring" order="10" sideWeight="0.49675852" weight="0.3298969" />
       <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.49675852" weight="0.32941177" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.13594842" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.14024718" />
       <window_info id="Web" order="4" side_tool="true" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.325" />
       <window_info anchor="right" id="Theme Preview" order="8" />
@@ -398,10 +385,11 @@
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="bottom" id="Thumbnails" order="14" weight="0.3298969" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info id="Nl-Palette" order="7" />
       <window_info anchor="right" id="Properties" order="8" />
+      <window_info anchor="bottom" id="Messages" order="12" sideWeight="0.4674361" weight="0.446875" />
       <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Application Servers" order="8" sideWeight="0.49675852" weight="0.3298969" />
     </layout>
@@ -417,13 +405,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/MainTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="44" selection-start-line="5" selection-start-column="44" selection-end-line="5" selection-end-column="44" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="285">
@@ -442,9 +423,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2745">
           <caret line="220" column="5" selection-start-line="220" selection-start-column="5" selection-end-line="220" selection-end-column="5" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -466,9 +444,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2745">
           <caret line="220" column="5" selection-start-line="220" selection-start-column="5" selection-end-line="220" selection-end-column="5" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -557,13 +532,6 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/com/elasticsearchRoom/SElasticsearch/SETest.java" />
     <entry file="file://$PROJECT_DIR$/src/main/java/com/elasticsearchRoom/SEEConf.java" />
     <entry file="file://$PROJECT_DIR$/src/main/java/com/RoomConfig.java" />
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/ssource/SClass.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="44" selection-start-line="44" selection-end-line="44" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/commons-beanutils/commons-beanutils/1.9.3/commons-beanutils-1.9.3.jar!/org/apache/commons/beanutils/BeanUtils.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="213">
@@ -645,22 +613,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="869">
           <caret line="220" column="5" selection-start-line="220" selection-start-column="5" selection-end-line="220" selection-end-column="5" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/MainTestController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="20" column="8" selection-start-line="20" selection-start-column="8" selection-end-line="22" selection-end-column="9" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/MainTestController.java" />
     <entry file="file://$PROJECT_DIR$/src/main/java/com/ssource/SFile.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="309">
@@ -678,31 +634,46 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/com/redissouce/RedisBean.java">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/redissouce/redisBean/RequestClientBean.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/redissouce/redisBean/RequestClientBean.java" />
+    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_101.jdk/Contents/Home/src.zip!/java/lang/Math.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="7" column="13" selection-start-line="7" selection-start-column="13" selection-end-line="7" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/MainTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="456">
-          <caret line="42" lean-forward="true" selection-start-line="42" selection-end-line="42" />
+        <state relative-caret-position="200">
+          <caret line="440" column="25" selection-start-line="440" selection-start-column="25" selection-end-line="440" selection-end-column="25" />
+          <folding>
+            <element signature="e#17181#17182#0" expanded="true" />
+            <element signature="e#17264#17265#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/redissouce/SRedis.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="146">
-          <caret line="138" column="41" selection-start-line="138" selection-start-column="41" selection-end-line="138" selection-end-column="41" />
+        <state relative-caret-position="-1312">
+          <caret line="126" column="47" selection-start-line="126" selection-start-column="47" selection-end-line="126" selection-end-column="47" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/MainTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="645">
+          <caret line="47" column="27" selection-start-line="46" selection-start-column="30" selection-end-line="47" selection-end-column="27" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/ssource/SClass.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="148" column="16" selection-start-line="148" selection-start-column="16" selection-end-line="148" selection-end-column="16" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="20" lean-forward="true" selection-start-line="20" selection-end-line="20" />
+        <state relative-caret-position="240">
+          <caret line="16" column="70" lean-forward="true" selection-start-line="16" selection-start-column="70" selection-end-line="16" selection-end-column="70" />
         </state>
       </provider>
     </entry>

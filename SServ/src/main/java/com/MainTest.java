@@ -3,6 +3,10 @@ package com;
 
 import com.redissouce.SRedis;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 public class MainTest {
     public static void main(String[] args) {
 //        SHttp.getInstance().download(
@@ -39,6 +43,27 @@ public class MainTest {
 //        for (int i=0;i<5;i++){
 //            SRedis.s().getStringFromRedis("WECHAT_TOKEN_CACHE_111111");
 //        }
+
+//        Integer total = 100;
+//        Integer size = 2;
+//        List<Integer> list = new ArrayList<>();
+//        for (int i=size;i>0;i--){
+//            Integer n = 0;
+//            if (i == 1) {
+//                n = total;
+//            }
+//            else {
+//                Random r     = new Random();
+//                int min   = 1; //
+//                int max   = total / i * 2;
+//                n = r.nextInt(max);
+//                n = n <= min ? 1: n;
+//            }
+//            total = total - n;
+//            list.add(n);
+//        }
+
     }
+
 
 }

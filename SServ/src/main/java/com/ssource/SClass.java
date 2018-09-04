@@ -143,41 +143,72 @@ public class SClass{
         return obj;
     }
 
-//    /**
-//     * 将一个 JavaBean 对象转化为一个  Map
-//     * @param bean 要转化的JavaBean 对象
-//     * @return 转化出来的  Map 对象
-//     * @throws IntrospectionException 如果分析类属性失败
-//     * @throws IllegalAccessException 如果实例化 JavaBean 失败
-//     * @throws InvocationTargetException 如果调用属性的 setter 方法失败
-//     */
-//    public static Map convertBean(Object bean)
-//            throws IntrospectionException, IllegalAccessException, InvocationTargetException {
-//        Class type = bean.getClass();
-//        Map returnMap = new HashMap();
-//        BeanInfo beanInfo = Introspector.getBeanInfo(type);
-//
-//        PropertyDescriptor[] propertyDescriptors =  beanInfo.getPropertyDescriptors();
-//        for (int i = 0; i< propertyDescriptors.length; i++) {
-//            PropertyDescriptor descriptor = propertyDescriptors[i];
-//            String propertyName = descriptor.getName();
-//            if (!propertyName.equals("class")) {
-//                Method readMethod = descriptor.getReadMethod();
-//                Object result = readMethod.invoke(bean, new Object[0]);
-//                if (result != null) {
-//                    returnMap.put(propertyName, result);
-//                } else {
-//                    returnMap.put(propertyName, "");
-//                }
-//            }
-//        }
-//        return returnMap;
-//    }
+    /**
+     * 获取一个特定长度的随机数
+     * @param length 长度
+     * @return f
+     */
+    public static String randomString(Integer length) {
+        Integer countLength = length;
+        StringBuffer numStr = new StringBuffer();
+        int num;
+        for (int i = 0; i < countLength; i++) {
+            // Math.random() 随机出0-1之间的实数，返回值是一个double 类型的
+            num = (int) (Math.random() * 10);
+            numStr.append(String.valueOf(num));
+        }
+        return numStr.toString();
+    }
+
+    /**
+     * 获取一个随机数数组(数字均不一致)
+     * @param size 数组数量
+     * @param start 开始数字
+     * @param end 结束数字
+     * @return f
+     */
+    public static List<Integer> randomList(int size,int start,int end) {
+        //1.创建集合容器对象
+        List list = new ArrayList();
+        //2.创建Random对象
+        Random r = new Random();
+        while(list.size() != size){
+            int num = r.nextInt(end-start) + start;
+            if(!list.contains(num)){
+                list.add(num);
+            }
+        }
+        return list;
+    }
+
+    /**
+     * 获取一个随机数数组(固定数组数据总和)
+     * @param total 数组数据总和
+     * @param size 数组长度
+     * @return f
+     */
+    public static List<Integer> randomList(int total, int size) {
+        List<Integer> list = new ArrayList<>();
+        for (int i=size;i>0;i--){
+            Integer n;
+            if (i == 1) {
+                n = total;
+            }
+            else {
+                Random r     = new Random();
+                int min   = 1; //
+                int max   = total / i * 2;
+                n = r.nextInt(max);
+                n = n <= min ? 1: n;
+            }
+            total = total - n;
+            list.add(n);
+        }
+        return list;
+    }
 
     /**
      * 过滤特殊字符
-     * @param source
-     * @return
      */
     public static String filterEmoji(String source) {
         if(StringUtils.isNotBlank(source)){
