@@ -6,12 +6,20 @@
 
   <groupId>com.isoops.serv</groupId>
   <artifactId>basic-module</artifactId>
-  <version>1.2.3</version>
+  <version>1.2.5</version>
   <packaging>jar</packaging>
 
   <name>basic-module Maven Webapp</name>
   <!-- FIXME change it to the project's website -->
   <url>http://www.example.com</url>
+
+  <distributionManagement>
+    <repository>
+      <id>nexus-rs</id>
+      <name>Nexus Release Snapshot Repository</name>
+      <url>http://ssl-api.isoops.com/repository/local/</url>
+    </repository>
+  </distributionManagement>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
