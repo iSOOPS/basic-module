@@ -66,26 +66,24 @@ public class SQRCode {
         try {
             bitMatrix = new MultiFormatWriter().encode(content, BarcodeFormat.QR_CODE, getWidth(), getHeight(), hints);
         } catch (WriterException e) {
-            e.printStackTrace();
             return null;
         }
-        boolean isOk = SFile.creatDir(pathLocal+"/bufferImage/");
+        boolean isOk = SFile.creatDir(pathLocal + File.separator + "bufferImage" + File.separator);
         if (isOk == false){
             return null;
         }
-        File outputFile = new File(pathLocal+"/bufferImage/"+fileName+"."+getFormat());
+        File outputFile = new File(pathLocal+ File.separator + "bufferImage" + File.separator + fileName + "." +getFormat());
         Path path = outputFile.toPath();
         try {
             MatrixToImageWriter.writeToPath(bitMatrix, getFormat(), path);// 输出图像
         } catch (IOException e) {
-            e.printStackTrace();
             return null;
         }
         return outputFile;
     }
 
     public boolean clearAllBufferImage(){
-        String dirPath = "./bufferImage/";
+        String dirPath = "." + File.separator + "bufferImage";
         // 如果sPath不以文件分隔符结尾，自动添加文件分隔符
         if (!dirPath.endsWith(File.separator)) {
             dirPath = dirPath + File.separator;

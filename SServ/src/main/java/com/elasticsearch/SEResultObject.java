@@ -11,22 +11,34 @@ public class SEResultObject<T> implements Serializable{
     private String msg;
     private T object;
     private Integer stateCode;
-
     private Long dataCount;//查询数据总数量
 
-    public Long getDataCount() {
-        return dataCount;
+
+
+    public SEResultObject(Boolean isok){
+        changeState(isok);
+        this.object = null;
     }
 
-    public void setDataCount(Long dataCount) {
+    public SEResultObject(String msg){
+        changeState(false);
+        this.object = null;
+        this.msg = msg;
+    }
+
+    public SEResultObject(T object){
+        changeState(true);
+        this.object = object;
+    }
+
+    public SEResultObject(Long dataCount,T object){
+        changeState(true);
+        this.object = object;
         this.dataCount = dataCount;
     }
 
-    public SEResultObject(Boolean isok){
-        changeState(false);
-        this.object = null;
-    }
-    public void changeState(Boolean bools)
+
+    private void changeState(Boolean bools)
     {
         if (bools)
         {
@@ -44,6 +56,19 @@ public class SEResultObject<T> implements Serializable{
             }
             this.stateCode = 400;
         }
+    }
+
+
+
+
+
+
+    public Long getDataCount() {
+        return dataCount;
+    }
+
+    public void setDataCount(Long dataCount) {
+        this.dataCount = dataCount;
     }
 
     public Integer getStateCode() {

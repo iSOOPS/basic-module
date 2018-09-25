@@ -3,6 +3,8 @@ package com.elasticsearch;
 
 import com.GLOBALSINGLETON;
 import com.alibaba.fastjson.JSON;
+import com.ssource.SBean;
+import com.ssource.SClass;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,6 +45,7 @@ import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,19 +55,35 @@ import java.util.Map;
  */
 public class SElastic {
 
-
-
     static Logger logger = LogManager.getLogger(SElastic.class.getName());
 
-    private  static int port = GLOBALSINGLETON.S().ES_PORT;
+    private static String ES_TYPE = "isoops";
+
+    private static int port = GLOBALSINGLETON.S().ES_PORT;
 
     private TransportClient client;
 
     private volatile static SElastic singleton;
 
+    private Map<String,XContentBuilder> builder;
+
+    public Map<String, XContentBuilder> getBuilder() {
+        return builder == null ? new HashMap<String, XContentBuilder>() : builder;
+    }
+
+    public void setBuilderContent(String key,XContentBuilder content) {
+        if (key == null || content == null){
+            return;
+        }
+        if (builder == null){
+            builder = new HashMap<>();
+        }
+        builder.put(key,content);
+    }
+
     private SElastic (){}
 
-    public static SElastic getSingleton() {
+    public static SElastic s() {
         if (singleton == null) {
             synchronized (SElastic.class) {
                 if (singleton == null) {
@@ -101,33 +120,25 @@ public class SElastic {
         return singleton;
     }
 
+
+
     /**
      * 根据别名判断索引是否存在
      * @param index 索引
      * @return f
      */
-    public boolean isExists(String index) {
+    public synchronized boolean isExists(String index) {
         String checkIndex = index.replace("#","").toLowerCase();
         IndicesExistsResponse existsResponse = this.client.admin().indices().prepareExists(checkIndex).get();
         return existsResponse.isExists();
     }
-    /**
-     * 判断指定的索引的类型是否存在
-     * @param index 索引名
-     * @param type 索引类型
-     * @return  f
-     */
-    public boolean isExistsType(String index,String type){
-        String checkIndex = index.replace("#","").toLowerCase();
-        TypesExistsResponse response = this.client.admin().indices().typesExists(new TypesExistsRequest(new String[]{checkIndex}, type)).actionGet();
-        return response.isExists();
-    }
+
     /**
      * 根据索引别名 删除索引
      * @param index 索引
      * @return f
      */
-    public boolean deleteIndex(String index) {
+    public synchronized boolean deleteIndex(String index) {
         String checkIndex = index.replace("#","").toLowerCase();
         try {
             DeleteIndexResponse response = this.client.admin().indices().
@@ -145,7 +156,7 @@ public class SElastic {
      * @param alias 别名
      * @return f
      */
-    public boolean addAliasForIndex(String index, String alias) {
+    public synchronized boolean addAliasForIndex(String index, String alias) {
         String checkIndex = index.replace("#","").toLowerCase();
         String checkAlias = alias.replace("#","").toLowerCase();
         IndicesAliasesResponse response = this.client.admin().indices()
@@ -156,201 +167,159 @@ public class SElastic {
     /**
      * 创建索引
      * @param index 索引名称
-     * @param type 类型
-     * @param mapping xml上下文
+     * @param builderKey 索引接口key
      */
-    public void creatIndex(String index,String type,XContentBuilder mapping){
+    public synchronized SEResultObject creatIndex(String index,String builderKey){
+        XContentBuilder content = getBuilder().get(builderKey);
+        if (content == null){
+            return new SEResultObject("索引结构不存在");
+        }
         try {
             String checkIndex = index.replace("#","").toLowerCase();
-
-            PutMappingRequest putmap = Requests.putMappingRequest(checkIndex).type(type).source(mapping);
+            PutMappingRequest putmap = Requests.putMappingRequest(checkIndex).type(ES_TYPE).source(content);
             //创建索引
             this.client.admin().indices().prepareCreate(checkIndex).execute().actionGet();
             //为索引添加映射
             this.client.admin().indices().putMapping(putmap).actionGet();
+            return new SEResultObject(true);
         } catch (ElasticsearchException e) {
-            e.printStackTrace();
+            logger.error("Elasticsearch creatIndex error:"+e);
+            logger.error("Elasticsearch creatIndex index:"+index);
+            logger.error("Elasticsearch creatIndex builderKey:"+builderKey);
+            logger.error("Elasticsearch creatIndex builder:"+JSON.toJSONString(getBuilder()));
+            return new SEResultObject("搜索服务又开小差了");
         }
     }
 
-    /**
-     * 创建索引类型
-     * @param index 索引
-     * @param type 类型
-     * @param mapping xml上下文
-     */
-    public void creatType(String index, String type,XContentBuilder mapping) {
-        try {
-            String checkIndex = index.replace("#","").toLowerCase();
 
-            this.client.admin().indices().preparePutMapping(checkIndex)
-                    .setType(type).setSource(mapping)
-                    .execute().actionGet();
-        } catch (ElasticsearchException e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * 增加 索引／类型／id／数据
-     * @param bean 数据对象
+     * @param alias 别名
+     * @param key id
+     * @param obj 对象
+     * @param <T> 对象类型
+     * @return f
      */
-    public SEResultObject addDocument(SElasticBase bean) {
-        SEResultObject object = new SEResultObject(false);
-        if (!bean.checkNullPrivate() && bean.getJsonMap()!=null){
-            object.setMsg("数据对象不能为空");
-            return object;
+    public synchronized <T>SEResultObject set(String alias,String key,T obj) {
+        if (alias == null || key == null || obj == null){
+            return new SEResultObject("数据对象不能为空");
         }
         try {
             IndexRequestBuilder indexRequestBuilder = this.client
-                    .prepareIndex(bean.index, bean.type, bean.id)
-                    .setSource(bean.getJsonMap(), XContentType.JSON);
-            IndexResponse response = indexRequestBuilder.get();
-            object.changeState(true);
-            return object;
+                    .prepareIndex(alias, ES_TYPE, key)
+                    .setSource(JSON.toJSONString(obj), XContentType.JSON);
+            indexRequestBuilder.get();
+            return new SEResultObject(true);
         }catch (Exception e){
-            logger.error("Elasticsearch addDocument error:"+e);
-            logger.error("Elasticsearch addDocument bean:"+JSON.toJSONString(bean));
-            object.setMsg("搜索服务又开小差了");
-            object.setStateCode(401);
-            return object;
+            logger.error("Elasticsearch set error:"+e);
+            logger.error("Elasticsearch set alias:"+alias);
+            logger.error("Elasticsearch set key:"+alias);
+            logger.error("Elasticsearch set obj:"+JSON.toJSONString(obj));
+            return new SEResultObject("搜索服务又开小差了");
         }
     }
 
     /**
      * 批量增加 索引／类型／id／数据
-     * @param beanList 数据对象数组
+     * @param alias 别名
+     * @param list 数组对象
+     * @param <T> 对象类型
+     * @return
      */
-    public SEResultObject addDocuments(List<SElasticBase> beanList) {
-        SEResultObject object = new SEResultObject(false);
+    public synchronized <T>SEResultObject set(String alias,List<SElasticSet<T>> list) {
+        if (alias == null || list == null){
+            return new SEResultObject("数据对象不能为空");
+        }
         BulkRequestBuilder bulkRequest = this.client.prepareBulk();
-        for (SElasticBase bean:beanList){
-            if (!bean.checkNullPrivate() || bean.getJsonMap()==null){
-                object.setMsg("数据对象不能为空");
-                return object;
+        for (SElasticSet set:list){
+            if (!set.checkData()){
+                return new SEResultObject("数据对象不能为空");
             }
-            bulkRequest.add(this.client.prepareIndex(bean.index, bean.type, StringUtils.trim(bean.id)).setSource(bean.getJsonMap()));
+            bulkRequest.add(this.client.prepareIndex(alias, ES_TYPE, StringUtils.trim(set.getKey())).setSource(JSON.toJSONString(set.getObject())));
         }
         try {
             BulkResponse bulkResponse = bulkRequest.get();
             if (bulkResponse.hasFailures()){
-                return object;
+                return new SEResultObject(false);
             }
-            object.changeState(true);
-            return object;
+            return new SEResultObject(true);
         }catch (Exception e){
-            logger.warn("Elasticsearch addDocuments error:"+e);
-            logger.warn("Elasticsearch addDocument bean:"+JSON.toJSONString(beanList));
-            object.setMsg("搜索服务又开小差了");
-            object.setStateCode(401);
-            return object;
+            logger.error("Elasticsearch sets error:"+e);
+            logger.error("Elasticsearch sets alias:"+alias);
+            logger.error("Elasticsearch sets alias:"+JSON.toJSONString(list));
+            return new SEResultObject("搜索服务又开小差了");
         }
     }
 
     /**
      * 根据 索引／类型／id 删除一条数据
-     * @param bean 数据对象
+     * @param alias 别名
+     * @param key id
+     * @return f
      */
-    public SEResultObject delDocument(SElasticBase bean) {
-        SEResultObject object = new SEResultObject(false);
-        if (!bean.checkNullPrivate() || bean.id==null ||bean.type==null ||bean.index==null){
-            object.setMsg("数据对象不能为空");
-            return object;
+    public synchronized SEResultObject delete(String alias,String key) {
+        if (alias == null || key == null){
+            return new SEResultObject("数据对象不能为空");
         }
         try {
-            DeleteResponse response = this.client.prepareDelete(bean.index,bean.type,bean.id).get();
-            object.changeState(true);
-            return object;
+            this.client.prepareDelete(alias,ES_TYPE,key).get();
+            return new SEResultObject(true);
         }catch (Exception e){
-            logger.warn("Elasticsearch delDocument error:"+e);
-            logger.warn("Elasticsearch delDocument bean:"+JSON.toJSONString(bean));
-            object.setMsg("搜索服务又开小差了");
-            object.setStateCode(401);
-            return object;
-        }
-    }
-
-    /**
-     * 根据  索引／类型／id 更新一条数据 里的 某个字段
-     * （如果需要更新大量字段 建议使用addDocument方法）
-     * @param bean
-     */
-    public SEResultObject updateDocument(SElasticBase bean) {
-        SEResultObject object = new SEResultObject(false);
-        if (!bean.checkNullPrivate()||
-                bean.id==null ||
-                bean.terms==null||
-                bean.terms.size()<1 ||
-                bean.terms.get(0).key==null ||
-                bean.terms.get(0).value==null){
-            object.setMsg("数据对象不能为空");
-            return object;
-        }
-        try {
-            UpdateRequest updateRequest = new UpdateRequest(bean.index, bean.type, bean.id);
-            updateRequest.doc(XContentFactory
-                    .jsonBuilder()
-                    .startObject()
-                    .field(bean.terms.get(0).key, bean.terms.get(0).value)
-                    .endObject());
-            this.client.update(updateRequest).get();
-            object.changeState(true);
-            return object;
-        }catch (Exception e){
-            logger.warn("updateDocument error:"+e);
-            logger.warn("updateDocument bean:"+JSON.toJSONString(bean));
-
-            object.setMsg("搜索服务又开小差了");
-            object.setStateCode(401);
-            return object;
+            logger.error("Elasticsearch delete error:"+e);
+            logger.error("Elasticsearch set alias:"+alias);
+            logger.error("Elasticsearch set key:"+alias);
+            return new SEResultObject("搜索服务又开小差了");
         }
     }
 
     /**
      * 根据 索引／类型／id 获取一条数据
-     * @param bean 数据对象
-     * @return
+     * @param alias 别名
+     * @param key id
+     * @return f
      */
-    public SEResultObject getDocument(SElasticBase bean) {
-        SEResultObject object = new SEResultObject(false);
-        if (!bean.checkNullPrivate() ){
-            object.setMsg("数据对象不能为空");
-            return object;
+    public <T> SEResultObject get(String alias,String key,Class<T> t) {
+        if (alias == null || key == null){
+            return new SEResultObject("数据对象不能为空");
         }
         try {
-            GetResponse response = this.client.prepareGet(bean.index, bean.type, bean.id).get();
+            GetResponse response = this.client.prepareGet(alias,ES_TYPE,key).get();
             Map<String, Object> map = response.getSource();
-            object.setObject(map);
-            object.changeState(true);
-            return object;
+            T object = SBean.mapToBean(map,t);
+            return new SEResultObject(object);
         }catch (Exception e){
-            logger.warn("Elasticsearch getDocument error:"+e);
-            logger.warn("Elasticsearch getDocument bean:"+JSON.toJSONString(bean));
-            object.setMsg("搜索服务又开小差了");
-            object.setStateCode(401);
-            return object;
+            logger.warn("Elasticsearch get error:"+e);
+            logger.warn("Elasticsearch get alias:"+alias);
+            logger.warn("Elasticsearch get key:"+key);
+            logger.warn("Elasticsearch get Class:"+t);
+            return new SEResultObject("搜索服务又开小差了");
         }
     }
 
     /**
      * 根据 索引／类型／value条件／key-value条件／范围条件 模糊检索数据（使用ik中文分词）
-     * @param bean
      */
-    public SEResultObject getDocuments_ik(SElasticBase bean) {
-        SEResultObject object = new SEResultObject(false);
-        if (bean.index==null || bean.type==null){
-            object.setMsg("数据对象不能为空");
-            return object;
+    public <T> SEResultObject<T> get(String alias,
+                                     List<SElasticTerm> terms,
+                                     List<SElasticSingle> singles,
+                                     List<SElasticRange> ranges,
+                                     List<SElasticSort> sorts,
+                                     Integer pageIndex,
+                                     Integer pageSize,
+                                     Class<T> t) {
+        if (alias == null){
+            return new SEResultObject<>("数据对象不能为空");
         }
         BoolQueryBuilder bq = QueryBuilders.boolQuery();
-        if (bean.terms != null && bean.terms.size()>0) {
-            for (SElasticTerm elasticTerm : bean.terms) {
+        if (terms != null && terms.size()>0) {
+            for (SElasticTerm elasticTerm : terms) {
                 switch (elasticTerm.type){
                     case must:{
-                        if (elasticTerm.isMulti == true){
+                        if (elasticTerm.isMulti){
                             bq = bq.must(QueryBuilders.multiMatchQuery(elasticTerm.value,elasticTerm.keys));
                         }
-                        else if (elasticTerm.isPhrase==true){
+                        else if (elasticTerm.isPhrase){
                             bq = bq.must(QueryBuilders.matchPhraseQuery(elasticTerm.key, elasticTerm.value));
                         }else {
                             bq = bq.must(QueryBuilders.matchQuery(elasticTerm.key, elasticTerm.value));
@@ -358,10 +327,10 @@ public class SElastic {
                         break;
                     }
                     case should:{
-                        if (elasticTerm.isMulti == true){
+                        if (elasticTerm.isMulti){
                             bq = bq.should(QueryBuilders.multiMatchQuery(elasticTerm.value,elasticTerm.keys));
                         }
-                        else if (elasticTerm.isPhrase==true){
+                        else if (elasticTerm.isPhrase){
                             bq = bq.should(QueryBuilders.matchPhraseQuery(elasticTerm.key, elasticTerm.value));
                         }else {
                             bq = bq.should(QueryBuilders.matchQuery(elasticTerm.key, elasticTerm.value));
@@ -369,10 +338,10 @@ public class SElastic {
                         break;
                     }
                     case mustNot:{
-                        if (elasticTerm.isMulti == true){
+                        if (elasticTerm.isMulti){
                             bq = bq.mustNot(QueryBuilders.multiMatchQuery(elasticTerm.value, elasticTerm.keys));
                         }
-                        else if (elasticTerm.isPhrase==true){
+                        else if (elasticTerm.isPhrase){
                             bq = bq.mustNot(QueryBuilders.matchPhraseQuery(elasticTerm.key, elasticTerm.value));
                         }else {
                             bq = bq.mustNot(QueryBuilders.matchQuery(elasticTerm.key, elasticTerm.value));
@@ -380,10 +349,10 @@ public class SElastic {
                         break;
                     }
                     default:{
-                        if (elasticTerm.isMulti == true){
+                        if (elasticTerm.isMulti){
                             bq = bq.must(QueryBuilders.multiMatchQuery(elasticTerm.value, elasticTerm.keys));
                         }
-                        else if (elasticTerm.isPhrase==true){
+                        else if (elasticTerm.isPhrase){
                             bq = bq.must(QueryBuilders.matchPhraseQuery(elasticTerm.key, elasticTerm.value));
                         }else {
                             bq = bq.must(QueryBuilders.matchQuery(elasticTerm.key, elasticTerm.value));
@@ -394,8 +363,8 @@ public class SElastic {
             }
         }
         //构造 全文单string 查询参数
-        if (bean.singleList!=null && bean.singleList.size()>0){
-            for (SElasticSingle elasticSingle : bean.singleList) {
+        if (singles!=null && singles.size()>0){
+            for (SElasticSingle elasticSingle : singles) {
                 switch (elasticSingle.type){
                     case must:{
                         bq = bq.must(QueryBuilders.queryStringQuery(elasticSingle.value));
@@ -418,8 +387,8 @@ public class SElastic {
         }
         //构造 范围 查询参数
         BoolQueryBuilder qb = QueryBuilders.boolQuery();
-        if (bean.ranges != null && bean.ranges.size() > 0) {
-            for (SElasticRange elasticRange : bean.ranges) {
+        if (ranges != null && ranges.size() > 0) {
+            for (SElasticRange elasticRange : ranges) {
                 if (elasticRange.key!=null && elasticRange.from!=null && elasticRange.to!=null) {
                     switch (elasticRange.type){
                         case must:{
@@ -464,30 +433,30 @@ public class SElastic {
         }
         //构造排序参数
         SortBuilder sortBuilder = null;
-        if (bean.sorts != null && bean.sorts.size()>0) {
-            for (SElasticSort elasticSort : bean.sorts) {
+        if (sorts != null && sorts.size()>0) {
+            for (SElasticSort elasticSort : sorts) {
                 if (elasticSort.key==null){
                     return null;
                 }
                 sortBuilder = SortBuilders
 //                        .fieldSort(elasticSort.key+".keyword")
                         .fieldSort(elasticSort.key)
-                        .order(elasticSort.isASC_DESC==true?SortOrder.ASC : SortOrder.DESC);
+                        .order(elasticSort.isASC_DESC ? SortOrder.ASC : SortOrder.DESC);
             }
         }
         //构造 查询
         SearchRequestBuilder searchRequestBuilder = this.client
-                .prepareSearch(bean.index)//索引
-                .setTypes(bean.type)//类型
+                .prepareSearch(alias)//索引
+                .setTypes(ES_TYPE)//类型
                 .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)//搜索方式 精确搜索（SCAN 无需扫描搜索）
-                .setFrom(bean.pageIndex)//分页 下标
-                .setSize(bean.pageSize)//分页 分页大小
+                .setFrom(pageIndex)//分页 下标
+                .setSize(pageSize)//分页 分页大小
                 .setExplain(true);//返回搜索响应信息
         if (bq != null)searchRequestBuilder .setQuery(bq); //搜索条件
         if (qb != null)searchRequestBuilder .setPostFilter(qb); //范围 搜索条件
         if (sortBuilder != null)searchRequestBuilder .addSort(sortBuilder);//排序条件
 
-        List<Map<String, Object>> lists = new ArrayList<Map<String, Object>>();
+        List<T> lists = new ArrayList<>();
         SearchResponse response = null;
         //查询
         try {
@@ -497,20 +466,44 @@ public class SElastic {
         }
         if (response == null){
             long i = 0;
-            object.setDataCount(i);
-            object.setObject(lists);
-            object.changeState(true);
-            return object;
+            return new SEResultObject(i,lists);
         }
         //取值
         SearchHits hits = response.getHits();
         for (SearchHit hit : hits) {
-            lists.add(hit.getSource());
+            lists.add(SBean.mapToBean(hit.getSource(),t));
         }
-        object.setDataCount(hits.getTotalHits());
-        object.setObject(lists);
-
-        object.changeState(true);
-        return object;
+        return new SEResultObject(hits.getTotalHits(),lists);
     }
+
+    public  <T> SEResultObject reindexEngineer(String alias, List<SElasticSet<T>> list, String builderKey) {
+        if (alias == null || list == null){
+            return new SEResultObject("数据对象不能为空");
+        }
+        //编辑新索引别名
+        String newIndex = alias + SClass.timeMillis();
+        //新建索引类型
+        SEResultObject resultObject = creatIndex(newIndex, builderKey);
+        if (!resultObject.getState()){
+            return resultObject;
+        }
+        //重建索引
+        resultObject = set(alias,list);
+        if (resultObject.getState()){
+            //通过索引别名删除旧索引
+            deleteIndex(alias);
+            //绑定别名到新索引
+            Boolean statusBind = addAliasForIndex(newIndex,alias);
+            if (!statusBind){
+                deleteIndex(newIndex);
+                return new SEResultObject("重建索引失败");
+            }
+        }
+        else {
+            //回滚操作，删除创建索引
+            deleteIndex(newIndex);
+        }
+        return resultObject;
+    }
+
 }

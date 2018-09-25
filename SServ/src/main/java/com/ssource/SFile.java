@@ -1,5 +1,7 @@
 package com.ssource;
 
+import com.alibaba.fastjson.JSON;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -35,7 +37,7 @@ public class SFile {
             }
             reader.close();
         }catch(IOException e){
-            e.printStackTrace();
+            return null;
         }finally{
             if(reader!=null){
                 try{
@@ -97,7 +99,7 @@ public class SFile {
         try {
             urlObject = new URL(url);
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            return null;
         }
         //打开链接
         HttpURLConnection conn = null;
@@ -113,15 +115,15 @@ public class SFile {
             //得到图片的二进制数据，以二进制封装得到数据，具有通用性
 
         } catch (IOException e) {
-            e.printStackTrace();
+            return null;
         }
 
         boolean isOk = SFile.creatDir(path);
         if (!isOk){
             return null;
         }
-        File imageFile = null;
-        byte[] data = new byte[0];
+        File imageFile ;
+        byte[] data;
         try {
             data = readInputStream(inStream);
             //new一个文件对象用来保存图片，默认保存当前工程根目录
@@ -133,7 +135,7 @@ public class SFile {
             //关闭输出流
             outStream.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            return null;
         }
         return imageFile;
     }
@@ -155,8 +157,36 @@ public class SFile {
         return outStream.toByteArray();
     }
 
+    public static boolean createFile(String string, String filePath, String fileName) {
+        // 拼接文件完整路径
+        String fullPath = filePath + fileName;
+        // 生成json格式文件
+        try {
+            // 保证创建一个新文件
+            File file = new File(fullPath);
+            if (!file.getParentFile().exists()) { // 如果父目录不存在，创建父目录
+                file.getParentFile().mkdirs();
+            }
+            if (file.exists()) { // 如果已存在,删除旧文件
+                file.delete();
+            }
+            file.createNewFile();
+
+            // 将格式化后的字符串写入文件
+            Writer write = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
+            write.write(string);
+            write.flush();
+            write.close();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+        // 返回是否成功的标记
+    }
+
+
     private static String getLocalPath(String path){
-        if (path.endsWith("/")) {
+        if (path.endsWith(File.separator)) {
             path = path.substring(0,path.length() - 1);
         }
         return path;

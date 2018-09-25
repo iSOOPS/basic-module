@@ -8,6 +8,7 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -31,10 +32,28 @@ public class SClass{
         return allCount/pageSize+1;
     }
 
+    public static boolean isNotBlank(Object...args){
+        return !isBlank(args);
+    }
+
+    public static boolean isBlank(Object...args){
+        for (Object temp:args){
+            if (temp instanceof String){
+                if (StringUtils.isBlank((String) temp)){
+                    return false;
+                }
+            }
+            else {
+                if (temp == null){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
     /**
      * 获取时间戳
-     * @return
      */
     public static String timeMillis(){
         return String.valueOf(timeMillisLong());
@@ -46,7 +65,6 @@ public class SClass{
     /**
      * 获取今天0点时间戳
      * offset 偏移量 0-今天0点，-1昨天0点
-     * @return f
      */
     public static long timeMillZerois(int offset){
         Date date = new Date();
@@ -59,51 +77,90 @@ public class SClass{
     }
 
     /**
-     * 获取当月开始时间戳 第一天0点
-     * @return 时间戳
+     * 获取某一天0点时间戳
+     * @param timeMill 时间戳
+     * @param offset 偏移量 0-今天0点，-1昨天0点
      */
-    public static long timeMillMonthStartTime(String timeMill){
-        Calendar c = Calendar.getInstance();
-        if (timeMill!=null)c.setTime(new Date(Long.valueOf(timeMill)*1000));
-        c.add(Calendar.MONTH, 0);
-        c.set(Calendar.DAY_OF_MONTH, 1);//设置为1号,当前日期既为本月第一天
-        c.set(Calendar.HOUR_OF_DAY, 0);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND,0);
-        c.set(Calendar.MILLISECOND, 0);
-        return c.getTimeInMillis();
-    }
-    /**
-     * 获取当月结束时间戳 最后一天0点
-     * @return 时间戳
-     */
-    public static long timeMillMonthEndTime(String timeMill) {
-        Calendar ca = Calendar.getInstance();
-        if (timeMill!=null)ca.setTime(new Date(Long.valueOf(timeMill)));
-        ca.set(Calendar.DAY_OF_MONTH, ca.getActualMaximum(Calendar.DAY_OF_MONTH));
-        ca.set(Calendar.HOUR_OF_DAY, 0);
-        ca.set(Calendar.MINUTE, 0);
-        ca.set(Calendar.SECOND,0);
-        ca.set(Calendar.MILLISECOND, 0);
-        return ca.getTimeInMillis();
+    public static long timeMillZerois(long timeMill,int offset){
+        long timeZero = timeMill - (timeMill % (24 * 60 * 60)) - 8 * 60 * 60;
+        return timeZero + offset * (24 * 60 * 60);
     }
 
-    public static String timeMillisToDate(String s){
+    /**
+     * 获取某个月开始第一天0点的偏移量时间戳
+     */
+    public static long timeMillMonthZerois(long timeMill,int offset){
+        return timeMillMonthZerois(timeMill,offset,true);
+    }
+
+    /**
+     * 获取某月某天的月份偏移时间戳
+     */
+    public static long timeMillMonthOffset(long timeMill,int offset){
+        return timeMillMonthZerois(timeMill,offset,false);
+    }
+
+    private static long timeMillMonthZerois(long timeMill,int offset,boolean zero){
+        Calendar ca = Calendar.getInstance();
+        Date date = new Date(timeMill * 1000);
+        ca.setTime(date);
+        ca.add(Calendar.MONTH, offset);
+        if (zero)ca.set(Calendar.DAY_OF_MONTH, 1);//设置为1号,当前日期既为本月第一天
+        return ca.getTimeInMillis() / 1000;
+    }
+    /**
+     * 获取某年开始第一天0点的偏移量时间戳
+     */
+    public static long timeMillYearZerois(long timeMill,int offset) {
+        return timeMillYearZerois(timeMill,offset,true);
+    }
+
+    /**
+     * 获取某天的年偏移量
+     */
+    public static long timeMillYearOffset(long timeMill,int offset) {
+        return timeMillYearZerois(timeMill,offset,true);
+    }
+
+    private static long timeMillYearZerois(long timeMill,int offset,boolean zero) {
+        Calendar ca = Calendar.getInstance();
+        Date date = new Date(timeMill * 1000);
+        ca.setTime(date);
+        ca.add(Calendar.YEAR, offset);
+        if (zero)ca.set(Calendar.DAY_OF_MONTH, 1);//设置为1号,当前日期既为本月第一天
+        ca.set(Calendar.MONTH, 0);//设置为1号,当前日期既为本月第一天
+        return ca.getTimeInMillis() / 1000;
+    }
+
+    /**
+     * 时间戳转换格式
+     * @param timeMill 时间戳
+     */
+    public static String timeMillisToDate(long timeMill){
         String res;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        long lt = new Long(s);
-        Date date = new Date(lt*1000);
+        Date date = new Date(timeMill * 1000);
         res = simpleDateFormat.format(date);
         return res;
     }
 
     /**
-     * 打印
-     * @param object
+     * 将时间转换为时间戳
+     * @param string 时间date
      */
-    public static void log(Object object){
-        System.out.println(object);
+    public static long dateToTimeMillis(String string){
+        Date date = null;
+        try {
+            date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(string);
+        } catch (ParseException e) {
+
+        }
+        if (date == null){
+            return 0;
+        }
+        return date.getTime() / 1000;
     }
+
     /**
      * 将一个 Map 对象转化为一个 JavaBean
      * @param type 要转化的类型

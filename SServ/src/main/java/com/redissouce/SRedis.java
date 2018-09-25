@@ -188,6 +188,22 @@ public class SRedis {
         return new RedisBean<>(status>0);
     }
 
+    public synchronized static Long incr(String key){
+        if (key == null || key.equals("")){
+            return null;
+        }
+        Long number = null;
+        try {
+            Jedis jedis = getJedis();
+            number = jedis.incr(key);
+            jedis.close();
+        }
+        catch (Exception e) {
+            logger.error("incr key error : " + e);
+        }
+        return number;
+    }
+
 //    public void show() {
 //        // key检测
 //        testKey();

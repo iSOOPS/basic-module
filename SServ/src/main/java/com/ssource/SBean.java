@@ -32,8 +32,6 @@ public class SBean {
             BeanUtils.populate(bean, map);
             return bean;
         } catch (Exception e) {
-            logger.error("***** mapToBean Error *****");
-            logger.error("Exception="+e);
             return null;
         }
     }
@@ -56,7 +54,7 @@ public class SBean {
         if(obj == null){
             return null;
         }
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         try {
             BeanInfo beanInfo = Introspector.getBeanInfo(obj.getClass());
             PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
@@ -71,8 +69,7 @@ public class SBean {
                 }
             }
         } catch (Exception e) {
-            logger.error("***** beanToMap Error *****");
-            logger.error("Exception="+e);
+            return null;
         }
         return map;
     }
@@ -81,16 +78,16 @@ public class SBean {
         if (bean == null){
             return null;
         }
-        T newBean = null;
+        T newBean;
         try {
             newBean = t.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
+            return null;
         }
         try {
             PropertyUtils.copyProperties(newBean,bean);
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
+            return null;
         }
         return newBean;
     }
@@ -107,6 +104,23 @@ public class SBean {
             }
         }
         return resultList;
+    }
+
+    public static <T>T mixBeans(Class<T> t,Object...args){
+        T newBean;
+        try {
+            newBean = t.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            return null;
+        }
+        for (Object temp:args){
+            try {
+                PropertyUtils.copyProperties(newBean,temp);
+            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                return null;
+            }
+        }
+        return newBean;
     }
 
     /**
