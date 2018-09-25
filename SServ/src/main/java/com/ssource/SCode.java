@@ -22,13 +22,13 @@ public class SCode {
         if (autoKey == null || autoKey.equals("")){
             return null;
         }
-        if (businessCode < 10 || businessCode > 99){
+        if (businessCode < 0 || businessCode > 99){
             return null;
         }
-        if (deskCode < 10 || deskCode > 99){
+        if (deskCode < 0 || deskCode > 99){
             return null;
         }
-        if (machineCode < 10 || machineCode > 99){
+        if (machineCode < 0 || machineCode > 99){
             return null;
         }
         Long autoCode = SRedis.incr(autoKey);
@@ -36,7 +36,7 @@ public class SCode {
             return null;
         }
         String autoString = String.format("%08d", autoCode);
-        return String.valueOf(businessCode) + String.valueOf(deskCode) + SClass.timeMillis() + String.valueOf(machineCode) + autoString;
+        return String.format("%02d", businessCode) + String.format("%02d", deskCode) + SClass.timeMillis() + String.format("%02d", machineCode) + autoString;
     }
 
     /**
@@ -52,10 +52,10 @@ public class SCode {
         if (autoKey == null || autoKey.equals("")){
             return null;
         }
-        if (businessCode < 10 || businessCode > 99){
+        if (businessCode < 0 || businessCode > 99){
             return null;
         }
-        if (deskCode < 10 || deskCode > 99){
+        if (deskCode < 0 || deskCode > 99){
             return null;
         }
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyMMdd");
@@ -66,7 +66,7 @@ public class SCode {
             return null;
         }
         String autoString = String.format("%06d", autoCode);
-        return String.valueOf(businessCode) + String.valueOf(deskCode) + dateString + autoString;
+        return String.format("%02d", businessCode) + String.format("%02d", deskCode) + dateString + autoString;
     }
 
     /**
