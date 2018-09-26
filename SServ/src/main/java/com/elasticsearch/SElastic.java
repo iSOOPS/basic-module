@@ -3,6 +3,11 @@ package com.elasticsearch;
 
 import com.GLOBALSINGLETON;
 import com.alibaba.fastjson.JSON;
+import com.elasticsearch.query.SElasticRange;
+import com.elasticsearch.query.SElasticSingle;
+import com.elasticsearch.query.SElasticSort;
+import com.elasticsearch.query.SElasticTerm;
+import com.elasticsearch.result.SEResultObject;
 import com.ssource.SBean;
 import com.ssource.SClass;
 import org.apache.commons.lang.StringUtils;
@@ -13,28 +18,21 @@ import org.elasticsearch.action.admin.indices.alias.IndicesAliasesResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
-import org.elasticsearch.action.admin.indices.exists.types.TypesExistsRequest;
-import org.elasticsearch.action.admin.indices.exists.types.TypesExistsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequestBuilder;
-import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
-import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.sort.SortBuilder;
@@ -169,11 +167,12 @@ public class SElastic {
      * @param index 索引名称
      * @param builderKey 索引接口key
      */
-    public synchronized SEResultObject creatIndex(String index,String builderKey){
+    public synchronized SEResultObject creatIndex(String index, String builderKey){
         XContentBuilder content = getBuilder().get(builderKey);
         if (content == null){
             return new SEResultObject("索引结构不存在");
         }
+        index = index.replace("#","").toLowerCase();
         try {
             String checkIndex = index.replace("#","").toLowerCase();
             PutMappingRequest putmap = Requests.putMappingRequest(checkIndex).type(ES_TYPE).source(content);
@@ -205,6 +204,7 @@ public class SElastic {
         if (alias == null || key == null || obj == null){
             return new SEResultObject("数据对象不能为空");
         }
+        alias = alias.replace("#","").toLowerCase();
         try {
             IndexRequestBuilder indexRequestBuilder = this.client
                     .prepareIndex(alias, ES_TYPE, key)
@@ -231,6 +231,7 @@ public class SElastic {
         if (alias == null || list == null){
             return new SEResultObject("数据对象不能为空");
         }
+        alias = alias.replace("#","").toLowerCase();
         BulkRequestBuilder bulkRequest = this.client.prepareBulk();
         for (SElasticSet set:list){
             if (!set.checkData()){
@@ -262,6 +263,7 @@ public class SElastic {
         if (alias == null || key == null){
             return new SEResultObject("数据对象不能为空");
         }
+        alias = alias.replace("#","").toLowerCase();
         try {
             this.client.prepareDelete(alias,ES_TYPE,key).get();
             return new SEResultObject(true);
@@ -283,6 +285,7 @@ public class SElastic {
         if (alias == null || key == null){
             return new SEResultObject("数据对象不能为空");
         }
+        alias = alias.replace("#","").toLowerCase();
         try {
             GetResponse response = this.client.prepareGet(alias,ES_TYPE,key).get();
             Map<String, Object> map = response.getSource();
@@ -297,151 +300,89 @@ public class SElastic {
         }
     }
 
+
+
     /**
      * 根据 索引／类型／value条件／key-value条件／范围条件 模糊检索数据（使用ik中文分词）
      */
-    public <T> SEResultObject<T> get(String alias,
-                                     List<SElasticTerm> terms,
-                                     List<SElasticSingle> singles,
-                                     List<SElasticRange> ranges,
-                                     List<SElasticSort> sorts,
-                                     Integer pageIndex,
-                                     Integer pageSize,
-                                     Class<T> t) {
+
+    private BoolQueryBuilder queryBuilder(BoolQueryBuilder bq,QueryBuilder builder,SESEnum type){
+        switch (type){
+            case must:
+                bq = bq.must(builder);
+                break;
+            case should:
+                bq = bq.should(builder);
+                break;
+            case mustNot:
+                bq = bq.mustNot(builder);
+                break;
+        }
+        return bq;
+    }
+    public <T> SEResultObject<List<T>> get(String alias,
+                                            List<SElasticTerm> terms,
+                                            List<SElasticSingle> singles,
+                                            List<SElasticRange> ranges,
+                                            List<SElasticSort> sorts,
+                                            Integer pageIndex,
+                                            Integer pageSize,
+                                            Class<T> t) {
         if (alias == null){
             return new SEResultObject<>("数据对象不能为空");
         }
+        alias = alias.replace("#","").toLowerCase();
+        pageIndex = pageIndex == null ? 0 : pageIndex;
+        pageSize = pageSize == null ? 10 : pageSize;
+
         BoolQueryBuilder bq = QueryBuilders.boolQuery();
         if (terms != null && terms.size()>0) {
-            for (SElasticTerm elasticTerm : terms) {
-                switch (elasticTerm.type){
-                    case must:{
-                        if (elasticTerm.isMulti){
-                            bq = bq.must(QueryBuilders.multiMatchQuery(elasticTerm.value,elasticTerm.keys));
-                        }
-                        else if (elasticTerm.isPhrase){
-                            bq = bq.must(QueryBuilders.matchPhraseQuery(elasticTerm.key, elasticTerm.value));
-                        }else {
-                            bq = bq.must(QueryBuilders.matchQuery(elasticTerm.key, elasticTerm.value));
-                        }
-                        break;
-                    }
-                    case should:{
-                        if (elasticTerm.isMulti){
-                            bq = bq.should(QueryBuilders.multiMatchQuery(elasticTerm.value,elasticTerm.keys));
-                        }
-                        else if (elasticTerm.isPhrase){
-                            bq = bq.should(QueryBuilders.matchPhraseQuery(elasticTerm.key, elasticTerm.value));
-                        }else {
-                            bq = bq.should(QueryBuilders.matchQuery(elasticTerm.key, elasticTerm.value));
-                        }
-                        break;
-                    }
-                    case mustNot:{
-                        if (elasticTerm.isMulti){
-                            bq = bq.mustNot(QueryBuilders.multiMatchQuery(elasticTerm.value, elasticTerm.keys));
-                        }
-                        else if (elasticTerm.isPhrase){
-                            bq = bq.mustNot(QueryBuilders.matchPhraseQuery(elasticTerm.key, elasticTerm.value));
-                        }else {
-                            bq = bq.mustNot(QueryBuilders.matchQuery(elasticTerm.key, elasticTerm.value));
-                        }
-                        break;
-                    }
-                    default:{
-                        if (elasticTerm.isMulti){
-                            bq = bq.must(QueryBuilders.multiMatchQuery(elasticTerm.value, elasticTerm.keys));
-                        }
-                        else if (elasticTerm.isPhrase){
-                            bq = bq.must(QueryBuilders.matchPhraseQuery(elasticTerm.key, elasticTerm.value));
-                        }else {
-                            bq = bq.must(QueryBuilders.matchQuery(elasticTerm.key, elasticTerm.value));
-                        }
-                        break;
-                    }
+            for (SElasticTerm term : terms) {
+                QueryBuilder builder;
+                if (term.keys.length > 1){
+                    builder = QueryBuilders.multiMatchQuery(term.value,term.keys);
                 }
+                else if (term.isPhrase){
+                    builder = QueryBuilders.matchPhraseQuery(term.keys[0], term.value);
+                }else {
+                    builder = QueryBuilders.matchQuery(term.keys[0], term.value);
+                }
+                queryBuilder(bq,builder,term.type);
             }
         }
         //构造 全文单string 查询参数
         if (singles!=null && singles.size()>0){
-            for (SElasticSingle elasticSingle : singles) {
-                switch (elasticSingle.type){
-                    case must:{
-                        bq = bq.must(QueryBuilders.queryStringQuery(elasticSingle.value));
-                        break;
-                    }
-                    case should:{
-                        bq = bq.should(QueryBuilders.queryStringQuery(elasticSingle.value));
-                        break;
-                    }
-                    case mustNot:{
-                        bq = bq.mustNot(QueryBuilders.queryStringQuery(elasticSingle.value));
-                        break;
-                    }
-                    default:{
-                        bq = bq.must(QueryBuilders.queryStringQuery(elasticSingle.value));
-                        break;
-                    }
-                }
+            for (SElasticSingle single : singles) {
+                QueryBuilder builder = QueryBuilders.queryStringQuery(single.value);
+                queryBuilder(bq,builder,single.type);
             }
         }
         //构造 范围 查询参数
         BoolQueryBuilder qb = QueryBuilders.boolQuery();
         if (ranges != null && ranges.size() > 0) {
-            for (SElasticRange elasticRange : ranges) {
-                if (elasticRange.key!=null && elasticRange.from!=null && elasticRange.to!=null) {
-                    switch (elasticRange.type){
-                        case must:{
-                            qb = qb.must(QueryBuilders
-                                    .rangeQuery(StringUtils.trim(elasticRange.key))//查询字段
-                                    .from(StringUtils.trim(elasticRange.from))//开始边界
-                                    .to(StringUtils.trim(elasticRange.to))//结束边界
-                                    .includeLower(true)     //包括下界
-                                    .includeUpper(true)); //包括上界
-                            break;
-                        }
-                        case should:{
-                            qb = qb.should(QueryBuilders
-                                    .rangeQuery(StringUtils.trim(elasticRange.key))
-                                    .from(StringUtils.trim(elasticRange.from))
-                                    .to(StringUtils.trim(elasticRange.to))
-                                    .includeLower(true)
-                                    .includeUpper(true));
-                            break;
-                        }
-                        case mustNot:{
-                            qb = qb.mustNot(QueryBuilders
-                                    .rangeQuery(StringUtils.trim(elasticRange.key))
-                                    .from(StringUtils.trim(elasticRange.from))
-                                    .to(StringUtils.trim(elasticRange.to))
-                                    .includeLower(true)
-                                    .includeUpper(true));
-                            break;
-                        }
-                        default:{
-                            qb = qb.must(QueryBuilders
-                                    .rangeQuery(StringUtils.trim(elasticRange.key))
-                                    .from(StringUtils.trim(elasticRange.from))
-                                    .to(StringUtils.trim(elasticRange.to))
-                                    .includeLower(true)
-                                    .includeUpper(true));
-                            break;
-                        }
-                    }
+            for (SElasticRange range : ranges) {
+                if (range.key!=null && range.from!=null && range.to!=null) {
+                    QueryBuilder builder = QueryBuilders
+                            .rangeQuery(StringUtils.trim(range.key))//查询字段
+                            .from(range.from)//开始边界
+                            .to(range.to)//结束边界
+                            .includeLower(true)     //包括下界
+                            .includeUpper(true);
+                    queryBuilder(bq,builder,range.type);
                 }
             }
         }
         //构造排序参数
         SortBuilder sortBuilder = null;
         if (sorts != null && sorts.size()>0) {
-            for (SElasticSort elasticSort : sorts) {
-                if (elasticSort.key==null){
+            for (SElasticSort sort : sorts) {
+                if (sort.key==null){
                     return null;
                 }
                 sortBuilder = SortBuilders
 //                        .fieldSort(elasticSort.key+".keyword")
-                        .fieldSort(elasticSort.key)
-                        .order(elasticSort.isASC_DESC ? SortOrder.ASC : SortOrder.DESC);
+                        .fieldSort(sort.key)
+                        .order(sort.isASC_DESC ? SortOrder.ASC : SortOrder.DESC);
             }
         }
         //构造 查询
@@ -452,21 +393,17 @@ public class SElastic {
                 .setFrom(pageIndex)//分页 下标
                 .setSize(pageSize)//分页 分页大小
                 .setExplain(true);//返回搜索响应信息
-        if (bq != null)searchRequestBuilder .setQuery(bq); //搜索条件
-        if (qb != null)searchRequestBuilder .setPostFilter(qb); //范围 搜索条件
+        searchRequestBuilder.setQuery(bq); //搜索条件
+        searchRequestBuilder.setPostFilter(qb); //范围 搜索条件
         if (sortBuilder != null)searchRequestBuilder .addSort(sortBuilder);//排序条件
 
         List<T> lists = new ArrayList<>();
-        SearchResponse response = null;
+        SearchResponse response;
         //查询
         try {
             response = searchRequestBuilder.execute().actionGet();
         }catch (Exception e){
-            e.printStackTrace();
-        }
-        if (response == null){
-            long i = 0;
-            return new SEResultObject(i,lists);
+            return new SEResultObject<>("搜索失败");
         }
         //取值
         SearchHits hits = response.getHits();
@@ -480,6 +417,7 @@ public class SElastic {
         if (alias == null || list == null){
             return new SEResultObject("数据对象不能为空");
         }
+        alias = alias.replace("#","").toLowerCase();
         //编辑新索引别名
         String newIndex = alias + SClass.timeMillis();
         //新建索引类型
@@ -505,5 +443,6 @@ public class SElastic {
         }
         return resultObject;
     }
+
 
 }

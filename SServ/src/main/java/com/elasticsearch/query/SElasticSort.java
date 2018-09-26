@@ -1,4 +1,4 @@
-package com.elasticsearch;
+package com.elasticsearch.query;
 
 import java.io.Serializable;
 
@@ -21,19 +21,16 @@ public class SElasticSort implements Serializable{
     public String key;//查询的字段名称
     public boolean isASC_DESC;//需要查询的数据
 
+    public SElasticSort(String key,boolean isASC_DESC){
+        this.key = key;
+        this.isASC_DESC = isASC_DESC;
+    }
+
     public String getKey() {
         return key;
     }
 
-    public void setKey(String key) {
-        this.key = key;
-    }
-
     public boolean isASC_DESC() {
         return isASC_DESC;
-    }
-
-    public void setASC_DESC(boolean ASC_DESC) {
-        isASC_DESC = ASC_DESC;
     }
 }

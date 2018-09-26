@@ -1,55 +1,43 @@
-package com.elasticsearch;
+package com.elasticsearch.result;
 
 import java.io.Serializable;
 
 /**
  * Created by Samuel on 2017/1/17.
  */
-public class SEResultObject<T> implements Serializable{
+public class SEResult implements Serializable{
 
     private Boolean state;
     private String msg;
-    private T object;
     private Integer stateCode;
     private Long dataCount;//查询数据总数量
 
 
 
-    public SEResultObject(Boolean isok){
+    public SEResult(Boolean isok){
         changeState(isok);
-        this.object = null;
     }
 
-    public SEResultObject(String msg){
+    public SEResult(String msg){
         changeState(false);
-        this.object = null;
         this.msg = msg;
     }
 
-    public SEResultObject(T object){
+    public SEResult(Long dataCount){
         changeState(true);
-        this.object = object;
-    }
-
-    public SEResultObject(Long dataCount,T object){
-        changeState(true);
-        this.object = object;
         this.dataCount = dataCount;
     }
 
 
-    private void changeState(Boolean bools)
-    {
-        if (bools)
-        {
+    private void changeState(Boolean bools) {
+        if (bools) {
             this.state = true;
             if (this.msg==null || this.msg.length()<1){
                 this.msg = "成功";
             }
             this.stateCode = 200;
         }
-        else
-        {
+        else {
             this.state = false;
             if (this.msg==null || this.msg.length()<1){
                 this.msg = "失败";
@@ -95,11 +83,4 @@ public class SEResultObject<T> implements Serializable{
         this.msg = msg;
     }
 
-    public T getObject() {
-        return object;
-    }
-
-    public void setObject(T object) {
-        this.object = object;
-    }
 }

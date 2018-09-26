@@ -1,5 +1,7 @@
-package com.elasticsearch;
+package com.elasticsearch.query;
 
+
+import com.elasticsearch.SESEnum;
 
 import java.io.Serializable;
 
@@ -27,60 +29,32 @@ public class SElasticTerm<T> implements Serializable{
      *  栗子:目标数据"我们在一起",存在数据A:"我们不在一起"、B:"可能我们在一起",AB都会被搜索出来
      *
      */
-    public String key;//查询的字段名称
+    public String[] keys;//多key
     public Object value;//需要查询的数据
 
     public boolean isPhrase;//是否精确匹配（默认false）
     public SESEnum type;//查询是非条件
 
-    public boolean isMulti;//多字段匹配一个values 满足其一即可 true- 使用keys
-    public String[] keys;//多key
-
-    public String[] getKeys() {
-        return keys;
-    }
-
-    public void setKeys(String[] keys) {
+    public SElasticTerm(boolean isPhrase,SESEnum type,Object value,String[] keys){
+        this.isPhrase = isPhrase;
+        this.type = type;
+        this.value = value;
         this.keys = keys;
     }
 
-    public boolean isMulti() {
-        return isMulti;
-    }
-
-    public void setMulti(boolean multi) {
-        isMulti = multi;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public boolean isPhrase() {
-        return isPhrase;
-    }
-
-    public void setPhrase(boolean phrase) {
-        isPhrase = phrase;
-    }
-
-    public SESEnum getType() {
-        return type;
-    }
-
-    public void setType(SESEnum type) {
-        this.type = type;
+    public String[] getKeys() {
+        return keys;
     }
 
     public Object getValue() {
         return value;
     }
 
-    public void setValue(Object value) {
-        this.value = value;
+    public boolean isPhrase() {
+        return isPhrase;
+    }
+
+    public SESEnum getType() {
+        return type;
     }
 }

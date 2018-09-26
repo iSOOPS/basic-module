@@ -1,4 +1,6 @@
-package com.elasticsearch;
+package com.elasticsearch.query;
+
+import com.elasticsearch.SESEnum;
 
 import java.io.Serializable;
 
@@ -20,40 +22,31 @@ public class SElasticRange implements Serializable{
      *  mustNot:获取必须在范围条件以外的数据
      */
     public String key;//查询字段名称
-    public String from;//其实范围（从0开始）
-    public String to;//结束范围
+    public Integer from;//其实范围（从0开始）
+    public Integer to;//结束范围
 
     public SESEnum type;//查询是非条件
+
+    public SElasticRange(String key,Integer from,Integer to,SESEnum type){
+        this.key = key;
+        this.from = from;
+        this.to = to;
+        this.type = type;
+    }
 
     public String getKey() {
         return key;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public Integer getFrom() {
+        return Integer.valueOf(from);
     }
 
-    public String getFrom() {
-        return from;
-    }
-
-    public void setFrom(String from) {
-        this.from = from;
-    }
-
-    public String getTo() {
-        return to;
-    }
-
-    public void setTo(String to) {
-        this.to = to;
+    public Integer getTo() {
+        return Integer.valueOf(to);
     }
 
     public SESEnum getType() {
         return type;
-    }
-
-    public void setType(SESEnum type) {
-        this.type = type;
     }
 }

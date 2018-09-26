@@ -1,4 +1,6 @@
-package com.elasticsearch;
+package com.elasticsearch.query;
+
+import com.elasticsearch.SESEnum;
 
 import java.io.Serializable;
 
@@ -23,19 +25,16 @@ public class SElasticSingle implements Serializable{
 
     public SESEnum type;//查询是非条件
 
+    public SElasticSingle(String value,SESEnum type){
+        this.value = value;
+        this.type = type;
+    }
+
     public String getValue() {
         return value;
     }
 
-    public void setValue(String value) {
-        this.value = value;
-    }
-
     public SESEnum getType() {
         return type;
-    }
-
-    public void setType(SESEnum type) {
-        this.type = type;
     }
 }
