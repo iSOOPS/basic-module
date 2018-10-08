@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by samuel on 2017/6/22.
@@ -36,12 +38,12 @@ public class SBean {
         }
     }
 
-    public static <T> List<T> mapsToBeans(List<Map<String, Object>> list, Class<T> t) {
+    public static <T> List<T> mapsToBeans(List<Map> list, Class<T> t) {
         if (list == null || t == null) {
             return null;
         }
         List<T> result = new ArrayList<>();
-        for (Map<String, Object> map : list){
+        for (Map map : list){
             T object = mapToBean(map,t);
             if (object!=null){
                 result.add(object);
@@ -73,6 +75,22 @@ public class SBean {
         }
         return map;
     }
+
+    public static List<Map> beansToMaps(List<Object> list) {
+        if(list == null || list.size()<1){
+            return null;
+        }
+        List<Map> maps = new ArrayList<>();
+        for (Object object:list){
+            Map map = beanToMap(object);
+            if (map == null){
+                continue;
+            }
+            maps.add(map);
+        }
+        return maps;
+    }
+
 
     public static <T>T beanToBean(Object bean, Class<T> t){
         if (bean == null){
@@ -216,5 +234,73 @@ public class SBean {
         return resultList;
     }
 
+    /**
+     * 求数组所有对象某个字段的和/求数字数组的的和
+     * @param list 数组
+     * @param objectKey 对象的key
+     * @return f
+     */
+    public static Long mixListNumbers(List list,String objectKey){
+        if (list == null) return null;
+        Long number = Long.valueOf(0);
+        for (Object obj : list){
+            if (objectKey == null){
+                number = number + sumNumber(number,obj);
+            }
+            else {
+                Map<String,Object> map = SBean.beanToMap(obj);
+                Object getObj = map.get(objectKey);
+                if (getObj == null){
+                    continue;
+                }
+                number = number + sumNumber(number,getObj);
+            }
+        }
+        return number;
+    }
 
+    /**
+     * 删除数组元素
+     * @param list 数组
+     * @param index 删除下标
+     * @param includeLower 是否删除包含下标
+     * @param direction 删除左偏移元素、删除右偏移元素
+     * @return f
+     */
+    public static boolean removeListItemByIndexRange(List list,
+                                                     Integer index,
+                                                     boolean includeLower,
+                                                     boolean direction){
+        if (list == null || list.size()<index){
+            return false;
+        }
+        if (direction){
+            for (int i = 0;i<index + (includeLower ? 1 : 0);i++){
+                list.remove(0);
+            }
+        }
+        else {
+            for (int i = 0;i<list.size() - index + 1 + (includeLower ? 1 : 0);i++){
+                list.remove(list.size()-1);
+            }
+        }
+        return true;
+    }
+
+    public static Long sumNumber(Long number,Object sumNumber){
+        String strNumber = String.valueOf(sumNumber);
+        if (isNumberic(strNumber)){
+            number = number + Long.valueOf(strNumber);
+        }
+        return number;
+    }
+
+    private static boolean isNumberic(String string){
+        Pattern pattern = Pattern.compile("-?[0-9]+.?[0-9]+");
+        Matcher isNum = pattern.matcher(string);
+        if( !isNum.matches() ){
+            return false;
+        }
+        return true;
+    }
 }

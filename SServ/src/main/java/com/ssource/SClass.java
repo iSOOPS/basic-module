@@ -11,6 +11,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Samuel on 16/7/6.
@@ -40,16 +42,16 @@ public class SClass{
         for (Object temp:args){
             if (temp instanceof String){
                 if (StringUtils.isBlank((String) temp)){
-                    return false;
+                    return true;
                 }
             }
             else {
                 if (temp == null){
-                    return false;
+                    return true;
                 }
             }
         }
-        return true;
+        return false;
     }
 
     /**
@@ -137,8 +139,12 @@ public class SClass{
      * @param timeMill 时间戳
      */
     public static String timeMillisToDate(long timeMill){
+        return timeMillisToDate(timeMill,"yyyy-MM-dd HH:mm:ss");
+    }
+
+    public static String timeMillisToDate(long timeMill,String format){
         String res;
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
         Date date = new Date(timeMill * 1000);
         res = simpleDateFormat.format(date);
         return res;
@@ -149,9 +155,13 @@ public class SClass{
      * @param string 时间date
      */
     public static long dateToTimeMillis(String string){
+        return dateToTimeMillis(string,"yyyy-MM-dd HH:mm:ss");
+    }
+
+    public static long dateToTimeMillis(String string,String format){
         Date date = null;
         try {
-            date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(string);
+            date = new SimpleDateFormat(format).parse(string);
         } catch (ParseException e) {
 
         }
@@ -262,6 +272,20 @@ public class SClass{
             list.add(n);
         }
         return list;
+    }
+
+    /**
+     * 判断string是否为数字
+     * @param string 字符串
+     * @return f
+     */
+    public static boolean isNumberic(String string){
+        Pattern pattern = Pattern.compile("-?[0-9]+.?[0-9]+");
+        Matcher isNum = pattern.matcher(string);
+        if( !isNum.matches() ){
+            return false;
+        }
+        return true;
     }
 
     /**
