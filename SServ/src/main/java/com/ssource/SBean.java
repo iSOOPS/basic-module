@@ -150,12 +150,12 @@ public class SBean {
      * @param condistionString 被合并对象成为合并对象里的字段名
      * @return 合并后数组-以basicList为主体
      */
-    public static List<Map<String,Object>> mixListToListByCondistion(List basicList,
+    public static List<Map> mixListToListByCondistion(List basicList,
                                                                      List subList,
                                                                      String basicCheckKey,
                                                                      String subCheckKey,
                                                                      String condistionString){
-        List<Map<String,Object>> resultList = new ArrayList<>();
+        List<Map> resultList = new ArrayList<>();
         for (Object basicObj : basicList){
             Map<String,Object> map = (basicObj instanceof Map) ? (Map<String, Object>) basicObj : SBean.beanToMap(basicObj);
             Map<String , Object> resultMap = new HashMap<>();
@@ -181,12 +181,12 @@ public class SBean {
     /**
      * 同上，但是排序是根据subList排序
      */
-    public static List<Map<String,Object>> mixListToListByCondistionDesc(List basicList,
+    public static List<Map> mixListToListByCondistionDesc(List basicList,
                                                                      List subList,
                                                                      String basicCheckKey,
                                                                      String subCheckKey,
                                                                      String condistionString){
-        List<Map<String,Object>> resultList = new ArrayList<>();
+        List<Map> resultList = new ArrayList<>();
         for (Object subObj : subList){
             Map<String , Object> resultMap = new HashMap<>();
             Object value;
