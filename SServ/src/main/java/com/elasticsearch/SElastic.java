@@ -29,7 +29,7 @@ import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.*;
@@ -92,22 +92,19 @@ public class SElastic {
                             Settings settings = Settings.builder()
                                     .put("client.transport.sniff", true)
                                     .put("cluster.name", GLOBALSINGLETON.S().ES_CLUSTER_NAME).build();
-                            InetAddress addr1 = InetAddress.getByName(GLOBALSINGLETON.S().ES_NOTE_MASTER);
-                            InetAddress addr2 = InetAddress.getByName(GLOBALSINGLETON.S().ES_NOTE_SLAVES.get(0));
-                            InetAddress addr3 = InetAddress.getByName(GLOBALSINGLETON.S().ES_NOTE_SLAVES.get(1));
                             singleton.client = new PreBuiltTransportClient(settings)
-                                    .addTransportAddress(new InetSocketTransportAddress(addr1, port))
-                                    .addTransportAddress(new InetSocketTransportAddress(addr2, port))
-                                    .addTransportAddress(new InetSocketTransportAddress(addr3, port));
+                                    .addTransportAddress(new TransportAddress(InetAddress.getByName(GLOBALSINGLETON.S().ES_NOTE_MASTER), port))
+                                    .addTransportAddress(new TransportAddress(InetAddress.getByName(GLOBALSINGLETON.S().ES_NOTE_SLAVES.get(0)), port))
+                                    .addTransportAddress(new TransportAddress(InetAddress.getByName(GLOBALSINGLETON.S().ES_NOTE_SLAVES.get(1)), port));
+
                         }
                         else {
                             Settings settings = Settings.builder()
                                     .put("client.transport.sniff", false)
                                     .put("cluster.name", GLOBALSINGLETON.S().ES_CLUSTER_NAME).build();
                             String host = (GLOBALSINGLETON.S().ENVIRONMENT == GLOBALSINGLETON.ENVIRONMENTENUM.TEST)?GLOBALSINGLETON.S().ES_NOTE_MASTER_TEST:GLOBALSINGLETON.S().ES_NOTE_MASTER_DEVELOP;
-                            InetAddress addr = InetAddress.getByName(host);
                             singleton.client = new PreBuiltTransportClient(settings)
-                                    .addTransportAddress(new InetSocketTransportAddress(addr, port));
+                                    .addTransportAddress(new TransportAddress(InetAddress.getByName(host), port));
                         }
                     } catch (UnknownHostException e) {
                         e.printStackTrace();
@@ -408,7 +405,10 @@ public class SElastic {
         //取值
         SearchHits hits = response.getHits();
         for (SearchHit hit : hits) {
-            lists.add(SBean.mapToBean(hit.getSource(),t));
+            T obj = SBean.mapToBean(hit.getSourceAsMap(),t);
+            if (obj!=null){
+                lists.add(obj);
+            }
         }
         return new SEResultObject(hits.getTotalHits(),lists);
     }

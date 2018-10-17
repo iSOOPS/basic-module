@@ -35,11 +35,11 @@ public class SElasticTerm<T> implements Serializable{
     public boolean isPhrase;//是否精确匹配（默认false）
     public SESEnum type;//查询是非条件
 
-    public SElasticTerm(boolean isPhrase,SESEnum type,Object value,String[] keys){
+    public SElasticTerm(boolean isPhrase,SESEnum type,Object value,String ...arg){
         this.isPhrase = isPhrase;
         this.type = type;
         this.value = value;
-        this.keys = keys;
+        this.keys = arg;
     }
 
     public String[] getKeys() {
