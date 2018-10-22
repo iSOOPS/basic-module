@@ -3,11 +3,13 @@ package com.elasticsearch;
 
 import com.GLOBALSINGLETON;
 import com.alibaba.fastjson.JSON;
+import com.carrotsearch.hppc.cursors.ObjectObjectCursor;
 import com.elasticsearch.query.SElasticRange;
 import com.elasticsearch.query.SElasticSingle;
 import com.elasticsearch.query.SElasticSort;
 import com.elasticsearch.query.SElasticTerm;
 import com.elasticsearch.result.SEResultObject;
+import com.elasticsearch.result.SEResultSearchObject;
 import com.ssource.SBean;
 import com.ssource.SClass;
 import org.apache.commons.lang.StringUtils;
@@ -28,6 +30,8 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.cluster.metadata.MappingMetaData;
+import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -130,11 +134,20 @@ public class SElastic {
 
     /**
      * 根据索引别名 删除索引
-     * @param index 索引
+     * @param alias 索引
      * @return f
      */
-    public synchronized boolean deleteIndex(String index) {
-        String checkIndex = index.replace("#","").toLowerCase();
+    public synchronized boolean deleteIndex(String alias) {
+        String checkAlias = alias.replace("#","").toLowerCase();
+        String checkIndex = null;
+        ImmutableOpenMap<String, ImmutableOpenMap<String, MappingMetaData>>  mappingRes = client.admin().indices().prepareGetMappings(checkAlias).get().getMappings();
+        ImmutableOpenMap<String, MappingMetaData> mappings = null;
+        for( ObjectObjectCursor<String, ImmutableOpenMap<String, MappingMetaData>> cursor : mappingRes){
+            checkIndex = cursor.key;
+        }
+        if (checkIndex == null){
+            return false;
+        }
         try {
             DeleteIndexResponse response = this.client.admin().indices().
                     delete(new DeleteIndexRequest(checkIndex)).actionGet();
@@ -205,7 +218,7 @@ public class SElastic {
         try {
             IndexRequestBuilder indexRequestBuilder = this.client
                     .prepareIndex(alias, ES_TYPE, key)
-                    .setSource(JSON.toJSONString(obj), XContentType.JSON);
+                    .setSource(SBean.beanToMap(obj), XContentType.JSON);
             indexRequestBuilder.get();
             return new SEResultObject(true);
         }catch (Exception e){
@@ -234,7 +247,7 @@ public class SElastic {
             if (!set.checkData()){
                 return new SEResultObject("数据对象不能为空");
             }
-            bulkRequest.add(this.client.prepareIndex(alias, ES_TYPE, StringUtils.trim(set.getKey())).setSource(JSON.toJSONString(set.getObject())));
+            bulkRequest.add(this.client.prepareIndex(alias, ES_TYPE, StringUtils.trim(set.getKey())).setSource(SBean.beanToMap(set.getObject())));
         }
         try {
             BulkResponse bulkResponse = bulkRequest.get();
@@ -394,7 +407,7 @@ public class SElastic {
         searchRequestBuilder.setPostFilter(qb); //范围 搜索条件
         if (sortBuilder != null)searchRequestBuilder .addSort(sortBuilder);//排序条件
 
-        List<T> lists = new ArrayList<>();
+        List<SEResultSearchObject<T>> lists = new ArrayList<>();
         SearchResponse response;
         //查询
         try {
@@ -407,10 +420,16 @@ public class SElastic {
         for (SearchHit hit : hits) {
             T obj = SBean.mapToBean(hit.getSourceAsMap(),t);
             if (obj!=null){
-                lists.add(obj);
+                SEResultSearchObject object = new SEResultSearchObject();
+                object.setIndex(hit.getIndex());
+                object.setType(hit.getType());
+                object.setObject(obj);
+                object.setId(hit.getId());
+                object.setScore(hit.getScore());
+                lists.add(object);
             }
         }
-        return new SEResultObject(hits.getTotalHits(),lists);
+        return new SEResultObject(hits.getTotalHits(),lists,hits.getMaxScore());
     }
 
     public  <T> SEResultObject reindexEngineer(String alias, List<SElasticSet<T>> list, String builderKey) {

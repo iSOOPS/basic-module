@@ -7,7 +7,11 @@ import java.io.Serializable;
  */
 public class SEResultObject<T> extends SEResult{
 
+    private float maxScore;
+
     private T object;
+
+
 
     public SEResultObject(Boolean isok){
         super(isok);
@@ -24,9 +28,20 @@ public class SEResultObject<T> extends SEResult{
         this.object = object;
     }
 
-    public SEResultObject(Long dataCount,T object){
+    public SEResultObject(Long dataCount,T object,float maxScore){
         super(dataCount);
         this.object = object;
+        this.maxScore = maxScore;
+    }
+
+
+
+    public float getMaxScore() {
+        return maxScore;
+    }
+
+    public void setMaxScore(float maxScore) {
+        this.maxScore = maxScore;
     }
 
     public T getObject() {

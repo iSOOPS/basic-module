@@ -22,10 +22,7 @@ import java.util.regex.Pattern;
  */
 public class SBean {
 
-    private static Logger logger = LogManager.getLogger(SBean.class.getName());
-
-
-    public static <T>T mapToBean(Map map, Class<T> t) {
+    public static <T> T mapToBean(Map map, Class<T> t) {
         if (map == null || t == null) {
             return null;
         }
@@ -43,9 +40,9 @@ public class SBean {
             return null;
         }
         List<T> result = new ArrayList<>();
-        for (Map map : list){
-            T object = mapToBean(map,t);
-            if (object!=null){
+        for (Map map : list) {
+            T object = mapToBean(map, t);
+            if (object != null) {
                 result.add(object);
             }
         }
@@ -53,7 +50,7 @@ public class SBean {
     }
 
     public static Map beanToMap(Object obj) {
-        if(obj == null){
+        if (obj == null) {
             return null;
         }
         Map<String, Object> map = new HashMap<>();
@@ -77,13 +74,13 @@ public class SBean {
     }
 
     public static List<Map> beansToMaps(List<Object> list) {
-        if(list == null || list.size()<1){
+        if (list == null || list.size() < 1) {
             return null;
         }
         List<Map> maps = new ArrayList<>();
-        for (Object object:list){
+        for (Object object : list) {
             Map map = beanToMap(object);
-            if (map == null){
+            if (map == null) {
                 continue;
             }
             maps.add(map);
@@ -92,8 +89,8 @@ public class SBean {
     }
 
 
-    public static <T>T beanToBean(Object bean, Class<T> t){
-        if (bean == null){
+    public static <T> T beanToBean(Object bean, Class<T> t) {
+        if (bean == null) {
             return null;
         }
         T newBean;
@@ -103,37 +100,37 @@ public class SBean {
             return null;
         }
         try {
-            PropertyUtils.copyProperties(newBean,bean);
+            PropertyUtils.copyProperties(newBean, bean);
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             return null;
         }
         return newBean;
     }
 
-    public static <T> List<T> beansToBeans(List list, Class<T> t){
+    public static <T> List<T> beansToBeans(List list, Class<T> t) {
         List<T> resultList = new ArrayList<>();
-        if (list == null || t == null){
+        if (list == null || t == null) {
             return resultList;
         }
-        for (Object object : list){
-            T get = beanToBean(object,t);
-            if (get!=null){
+        for (Object object : list) {
+            T get = beanToBean(object, t);
+            if (get != null) {
                 resultList.add(get);
             }
         }
         return resultList;
     }
 
-    public static <T>T mixBeans(Class<T> t,Object...args){
+    public static <T> T mixBeans(Class<T> t, Object... args) {
         T newBean;
         try {
             newBean = t.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
             return null;
         }
-        for (Object temp:args){
+        for (Object temp : args) {
             try {
-                PropertyUtils.copyProperties(newBean,temp);
+                PropertyUtils.copyProperties(newBean, temp);
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 return null;
             }
@@ -143,34 +140,34 @@ public class SBean {
 
     /**
      * 合并两个数组对象结构
-     * @param basicList 合并对象
-     * @param subList 被合并对象
-     * @param basicCheckKey 校验相同的key对应的value == true 则合并
-     * @param subCheckKey 校验相同的key对应的value == true 则合并
+     *
+     * @param basicList        合并对象
+     * @param subList          被合并对象
+     * @param basicCheckKey    校验相同的key对应的value == true 则合并
+     * @param subCheckKey      校验相同的key对应的value == true 则合并
      * @param condistionString 被合并对象成为合并对象里的字段名
      * @return 合并后数组-以basicList为主体
      */
     public static List<Map> mixListToListByCondistion(List basicList,
-                                                                     List subList,
-                                                                     String basicCheckKey,
-                                                                     String subCheckKey,
-                                                                     String condistionString){
+                                                      List subList,
+                                                      String basicCheckKey,
+                                                      String subCheckKey,
+                                                      String condistionString) {
         List<Map> resultList = new ArrayList<>();
-        for (Object basicObj : basicList){
-            Map<String,Object> map = (basicObj instanceof Map) ? (Map<String, Object>) basicObj : SBean.beanToMap(basicObj);
-            Map<String , Object> resultMap = new HashMap<>();
+        for (Object basicObj : basicList) {
+            Map<String, Object> map = (basicObj instanceof Map) ? (Map<String, Object>) basicObj : SBean.beanToMap(basicObj);
+            Map<String, Object> resultMap = new HashMap<>();
             resultMap.putAll(map);
-            for (Object subObj : subList){
+            for (Object subObj : subList) {
                 Object value;
-                if (subObj instanceof String){
+                if (subObj instanceof String) {
                     value = subObj;
-                }
-                else {
-                    Map<String,Object> mapSub = (subObj instanceof Map) ? (Map<String, Object>) subObj : SBean.beanToMap(subObj);
+                } else {
+                    Map<String, Object> mapSub = (subObj instanceof Map) ? (Map<String, Object>) subObj : SBean.beanToMap(subObj);
                     value = mapSub.get(subCheckKey);
                 }
-                if (value!=null && map.get(basicCheckKey)!=null && value.equals(map.get(basicCheckKey))){
-                    resultMap.put(condistionString,subObj);
+                if (value != null && map.get(basicCheckKey) != null && value.equals(map.get(basicCheckKey))) {
+                    resultMap.put(condistionString, subObj);
                 }
             }
             resultList.add(resultMap);
@@ -182,26 +179,25 @@ public class SBean {
      * 同上，但是排序是根据subList排序
      */
     public static List<Map> mixListToListByCondistionDesc(List basicList,
-                                                                     List subList,
-                                                                     String basicCheckKey,
-                                                                     String subCheckKey,
-                                                                     String condistionString){
+                                                          List subList,
+                                                          String basicCheckKey,
+                                                          String subCheckKey,
+                                                          String condistionString) {
         List<Map> resultList = new ArrayList<>();
-        for (Object subObj : subList){
-            Map<String , Object> resultMap = new HashMap<>();
+        for (Object subObj : subList) {
+            Map<String, Object> resultMap = new HashMap<>();
             Object value;
-            Map<String,Object> mapSub = (subObj instanceof Map) ? (Map<String, Object>) subObj : SBean.beanToMap(subObj);
-            if (subObj instanceof String){
+            Map<String, Object> mapSub = (subObj instanceof Map) ? (Map<String, Object>) subObj : SBean.beanToMap(subObj);
+            if (subObj instanceof String) {
                 value = subObj;
-            }
-            else {
+            } else {
                 value = mapSub.get(subCheckKey);
             }
-            for (Object basicObj : basicList){
-                Map<String , Object> map = (basicObj instanceof Map) ? (Map<String, Object>) basicObj : SBean.beanToMap(basicObj);
-                if (value!=null && map.get(basicCheckKey)!=null && value.equals(map.get(basicCheckKey))){
+            for (Object basicObj : basicList) {
+                Map<String, Object> map = (basicObj instanceof Map) ? (Map<String, Object>) basicObj : SBean.beanToMap(basicObj);
+                if (value != null && map.get(basicCheckKey) != null && value.equals(map.get(basicCheckKey))) {
                     resultMap.putAll(map);
-                    resultMap.put(condistionString,subObj);
+                    resultMap.put(condistionString, subObj);
                     break;
                 }
             }
@@ -210,23 +206,20 @@ public class SBean {
         return resultList;
     }
 
-    public static <T> List<T> getListValueList(List basicList,String key) {
+    public static <T> List<T> getListValueList(List basicList, String key) {
         List<T> resultList = new ArrayList<>();
         if (basicList == null) return resultList;
-        for (Object obj : basicList){
-            if (obj instanceof String){
+        for (Object obj : basicList) {
+            if (obj instanceof String) {
                 return resultList;
-            }
-            else if (obj instanceof Integer){
+            } else if (obj instanceof Integer) {
                 return resultList;
-            }
-            else if (obj instanceof Long){
+            } else if (obj instanceof Long) {
                 return resultList;
-            }
-            else {
-                Map<String,Object> map = SBean.beanToMap(obj);
+            } else {
+                Map<String, Object> map = SBean.beanToMap(obj);
                 T getObj = (T) map.get(key);
-                if (getObj!=null){
+                if (getObj != null) {
                     resultList.add(getObj);
                 }
             }
@@ -236,24 +229,24 @@ public class SBean {
 
     /**
      * 求数组所有对象某个字段的和/求数字数组的的和
-     * @param list 数组
+     *
+     * @param list      数组
      * @param objectKey 对象的key
      * @return f
      */
-    public static Long mixListNumbers(List list,String objectKey){
+    public static Long mixListNumbers(List list, String objectKey) {
         if (list == null) return null;
         Long number = Long.valueOf(0);
-        for (Object obj : list){
-            if (objectKey == null){
-                number = number + sumNumber(number,obj);
-            }
-            else {
-                Map<String,Object> map = SBean.beanToMap(obj);
+        for (Object obj : list) {
+            if (objectKey == null) {
+                number = number + sumNumber(number, obj);
+            } else {
+                Map<String, Object> map = SBean.beanToMap(obj);
                 Object getObj = map.get(objectKey);
-                if (getObj == null){
+                if (getObj == null) {
                     continue;
                 }
-                number = number + sumNumber(number,getObj);
+                number = number + sumNumber(number, getObj);
             }
         }
         return number;
@@ -261,44 +254,44 @@ public class SBean {
 
     /**
      * 删除数组元素
-     * @param list 数组
-     * @param index 删除下标
+     *
+     * @param list         数组
+     * @param index        删除下标
      * @param includeLower 是否删除包含下标
-     * @param direction 删除左偏移元素、删除右偏移元素
+     * @param direction    删除左偏移元素、删除右偏移元素
      * @return f
      */
     public static boolean removeListItemByIndexRange(List list,
                                                      Integer index,
                                                      boolean includeLower,
-                                                     boolean direction){
-        if (list == null || list.size()<index){
+                                                     boolean direction) {
+        if (list == null || list.size() < index) {
             return false;
         }
-        if (direction){
-            for (int i = 0;i<index + (includeLower ? 1 : 0);i++){
+        if (direction) {
+            for (int i = 0; i < index + (includeLower ? 1 : 0); i++) {
                 list.remove(0);
             }
-        }
-        else {
-            for (int i = 0;i<list.size() - index + 1 + (includeLower ? 1 : 0);i++){
-                list.remove(list.size()-1);
+        } else {
+            for (int i = 0; i < list.size() - index + 1 + (includeLower ? 1 : 0); i++) {
+                list.remove(list.size() - 1);
             }
         }
         return true;
     }
 
-    public static Long sumNumber(Long number,Object sumNumber){
+    public static Long sumNumber(Long number, Object sumNumber) {
         String strNumber = String.valueOf(sumNumber);
-        if (isNumberic(strNumber)){
+        if (isNumberic(strNumber)) {
             number = number + Long.valueOf(strNumber);
         }
         return number;
     }
 
-    private static boolean isNumberic(String string){
+    private static boolean isNumberic(String string) {
         Pattern pattern = Pattern.compile("-?[0-9]+.?[0-9]+");
         Matcher isNum = pattern.matcher(string);
-        if( !isNum.matches() ){
+        if (!isNum.matches()) {
             return false;
         }
         return true;

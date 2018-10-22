@@ -36,6 +36,11 @@ public class MainTest {
 
         Integer iii = Integer.valueOf(bbb);
         System.out.print(aaa);
+
+
+        Integer cccc = aaabbb();
+        System.out.print(cccc);
+
     }
 
     public boolean isNumeric(String str){
@@ -45,5 +50,11 @@ public class MainTest {
             return false;
         }
         return true;
+    }
+
+    public static Integer aaabbb(){
+        Integer count = 201;
+        Integer pa = 1;
+        return count/100 * pa;
     }
 }
