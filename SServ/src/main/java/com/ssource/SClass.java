@@ -103,6 +103,7 @@ public class SClass{
     }
 
     private static long timeMillMonthZerois(long timeMill,int offset,boolean zero){
+        timeMill = zero ? timeMillZerois(timeMill,0) : timeMill;
         Calendar ca = Calendar.getInstance();
         Date date = new Date(timeMill * 1000);
         ca.setTime(date);
@@ -125,6 +126,7 @@ public class SClass{
     }
 
     private static long timeMillYearZerois(long timeMill,int offset,boolean zero) {
+        timeMill = zero ? timeMillZerois(timeMill,0) : timeMill;
         Calendar ca = Calendar.getInstance();
         Date date = new Date(timeMill * 1000);
         ca.setTime(date);
