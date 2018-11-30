@@ -22,7 +22,7 @@ public class SElasticTerm<T> implements Serializable{
      *  should:获取字段为key且其值满足value数据条目(也可以不满足)
      *  mustNot:获取字段为key且其不满足value的数据条目
      *
-     *  isPhrase控制
+     *  isPhrase控制（要求顺序）
      *  true 精确匹配
      *  栗子:目标数据"我们在一起",存在数据A:"我们不在一起"、B:"可能我们在一起",B将会被搜索出来,A不会
      *  false 非精确匹配
@@ -41,6 +41,8 @@ public class SElasticTerm<T> implements Serializable{
         this.value = value;
         this.keys = arg;
     }
+
+
 
     public String[] getKeys() {
         return keys;

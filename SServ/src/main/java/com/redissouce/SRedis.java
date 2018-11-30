@@ -149,7 +149,7 @@ public class SRedis {
         catch (Exception e) {
             logger.error("Get key error : " + e);
         }
-        bean.changStatus(bean.getObject() != null);
+        bean.changStatus(bean.getObject() != null && !bean.getObject().equals("null"));
         return bean;
     }
 

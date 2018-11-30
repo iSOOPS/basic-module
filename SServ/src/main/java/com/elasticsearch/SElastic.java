@@ -10,7 +10,6 @@ import com.elasticsearch.query.SElasticSort;
 import com.elasticsearch.query.SElasticTerm;
 import com.elasticsearch.result.SEResultObject;
 import com.elasticsearch.result.SEResultSearchObject;
-import com.elasticsearch.xcontent.SContentBuilder;
 import com.elasticsearch.xcontent.SElasticContent;
 import com.ssource.SBean;
 import com.ssource.SClass;
@@ -37,9 +36,10 @@ import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.*;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.sort.SortBuilder;
@@ -47,7 +47,6 @@ import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -72,20 +71,6 @@ public class SElastic {
     private volatile static SElastic singleton;
 
     private Map<String, SElasticContent> builder;
-
-    public Map<String, SElasticContent> getBuilder() {
-        return builder == null ? new HashMap<String, SElasticContent>() : builder;
-    }
-
-    public void setBuilderContent(String key, SElasticContent content) {
-        if (key == null || content == null) {
-            return;
-        }
-        if (builder == null) {
-            builder = new HashMap<>();
-        }
-        builder.put(key, content);
-    }
 
     private SElastic() {
     }
@@ -181,11 +166,9 @@ public class SElastic {
     /**
      * 创建索引
      *
-     * @param index      索引名称
-     * @param builderKey 索引接口key
+     * @param index 索引名称
      */
-    public synchronized SEResultObject creatIndex(String index, String builderKey) {
-        XContentBuilder content = createXBuilder(builderKey);
+    public synchronized SEResultObject creatIndex(String index, XContentBuilder content) {
         if (content == null) {
             return new SEResultObject("索引结构不存在");
         }
@@ -202,33 +185,8 @@ public class SElastic {
         } catch (ElasticsearchException e) {
             logger.error("Elasticsearch creatIndex error:" + e);
             logger.error("Elasticsearch creatIndex index:" + index);
-            logger.error("Elasticsearch creatIndex builderKey:" + builderKey);
-            logger.error("Elasticsearch creatIndex builder:" + JSON.toJSONString(getBuilder()));
             content.close();
             return new SEResultObject("搜索服务又开小差了");
-        }
-    }
-
-    private XContentBuilder createXBuilder(String builderKey) {
-        SElasticContent builder = getBuilder().get(builderKey);
-        if (builder == null){
-            return null;
-        }
-        try {
-            XContentBuilder mapping = XContentFactory.jsonBuilder()
-                    .startObject()
-                    .startObject("properties");
-            for (SContentBuilder content : builder.getList()) {
-                mapping.startObject(content.getKeyName()).field("type", content.getKeyType());
-                if (content.getAnalyzerType() != null) {
-                    mapping.field("analyzer", content.getAnalyzerType());
-                }
-                mapping.endObject();
-            }
-            mapping.endObject().endObject();
-            return mapping;
-        } catch (IOException e) {
-            return null;
         }
     }
 
@@ -416,16 +374,15 @@ public class SElastic {
             }
         }
         //构造排序参数
-        SortBuilder sortBuilder = null;
+        List<SortBuilder> newSorts = new ArrayList<>();
+        newSorts.add(SortBuilders.scoreSort());
         if (sorts != null && sorts.size() > 0) {
             for (SElasticSort sort : sorts) {
-                if (sort.key == null) {
-                    return null;
+                if (sort.key != null) {
+                    newSorts.add(SortBuilders
+                            .fieldSort(sort.key)
+                            .order(sort.isASC_DESC ? SortOrder.ASC : SortOrder.DESC));
                 }
-                sortBuilder = SortBuilders
-//                        .fieldSort(elasticSort.key+".keyword")
-                        .fieldSort(sort.key)
-                        .order(sort.isASC_DESC ? SortOrder.ASC : SortOrder.DESC);
             }
         }
         //构造 查询
@@ -438,7 +395,9 @@ public class SElastic {
                 .setExplain(true);//返回搜索响应信息
         searchRequestBuilder.setQuery(bq); //搜索条件
         searchRequestBuilder.setPostFilter(qb); //范围 搜索条件
-        if (sorts != null) searchRequestBuilder.addSort(sortBuilder);//排序条件
+        for (SortBuilder sortBuilder:newSorts){
+            searchRequestBuilder.addSort(sortBuilder);//排序条件
+        }
 
         List<SEResultSearchObject<T>> lists = new ArrayList<>();
         SearchResponse response;
@@ -465,7 +424,7 @@ public class SElastic {
         return new SEResultObject(hits.getTotalHits(), lists, hits.getMaxScore());
     }
 
-    public <T> SEResultObject reindexEngineer(String alias, List<SElasticSet<T>> list, String builderKey) {
+    public <T> SEResultObject reindexEngineer(String alias, List<SElasticSet<T>> list, XContentBuilder content) {
         if (alias == null || list == null) {
             return new SEResultObject("数据对象不能为空");
         }
@@ -473,7 +432,7 @@ public class SElastic {
         //编辑新索引别名
         String newIndex = alias + SClass.timeMillis();
         //新建索引类型
-        SEResultObject resultObject = creatIndex(newIndex, builderKey);
+        SEResultObject resultObject = creatIndex(newIndex, content);
         if (!resultObject.getState()) {
             return resultObject;
         }
