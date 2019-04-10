@@ -107,7 +107,10 @@ public class SClass{
         Date date = new Date(timeMill * 1000);
         ca.setTime(date);
         ca.add(Calendar.MONTH, offset);
-        if (zero)ca.set(Calendar.DAY_OF_MONTH, 1);//设置为1号,当前日期既为本月第一天
+        if (zero)ca.set(Calendar.DAY_OF_MONTH, 1);
+        if (zero)ca.set(Calendar.HOUR_OF_DAY, 0);
+        if (zero)ca.set(Calendar.MINUTE, 0);
+        if (zero)ca.set(Calendar.SECOND, 0);
         return ca.getTimeInMillis() / 1000;
     }
     /**
@@ -129,8 +132,10 @@ public class SClass{
         Date date = new Date(timeMill * 1000);
         ca.setTime(date);
         ca.add(Calendar.YEAR, offset);
-        if (zero)ca.set(Calendar.DAY_OF_MONTH, 1);//设置为1号,当前日期既为本月第一天
-        ca.set(Calendar.MONTH, 0);//设置为1号,当前日期既为本月第一天
+        if (zero)ca.set(Calendar.DAY_OF_MONTH, 1);
+        if (zero)ca.set(Calendar.HOUR_OF_DAY, 0);
+        if (zero)ca.set(Calendar.MINUTE, 0);
+        if (zero)ca.set(Calendar.SECOND, 0);
         return ca.getTimeInMillis() / 1000;
     }
 

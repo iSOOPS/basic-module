@@ -55,7 +55,7 @@ public class MainTest {
         System.out.print(cccc);
 //      1541001600
 //        1541030400
-        Long monthtime = SClass.timeMillMonthZerois(1541001600,0);
+        Long monthtime = SClass.timeMillMonthZerois(1541006600,0);
         String strrr = SClass.timeMillisToDate(monthtime);
         System.out.print(strrr);
 
