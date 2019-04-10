@@ -6,7 +6,7 @@
 
   <groupId>com.isoops.serv</groupId>
   <artifactId>basic-module</artifactId>
-  <version>1.4.6</version>
+  <version>1.5.0</version>
   <packaging>jar</packaging>
 
   <name>basic-module Maven Webapp</name>
@@ -168,6 +168,20 @@
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-jdk16</artifactId>
       <version>1.46</version>
+    </dependency>
+
+    <!--节点转换-->
+    <dependency>
+      <groupId>dom4j</groupId>
+      <artifactId>dom4j</artifactId>
+      <version>1.6.1</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <version>1.9</version>
     </dependency>
 
   </dependencies>

@@ -12,6 +12,7 @@ import com.ssource.SCode;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,11 @@ import java.util.regex.Pattern;
 
 public class MainTest {
     public static void main(String[] args) {
+
+
+        String xml = "<xml>    <AppId><![CDATA[wx65d0706cc8ce663f]]></AppId>    <Encrypt><![CDATA[sGlp7h1fhRlb5ZzkW2mvUApy+8BuyIu/trJQ4RVPx9fJLaLDWu91cYbis8nQxQw1yZ51BIhTllLeb9g1bMQfcfQ/r/KgBS3iM0lYvtNbgXqNby8V0nN0CWRsVlk5//PGkXng+RX0jXp6z3CJrDk9+wPVhju3Wm6l2r5VYQV1+V2CN5g4AqKjsBJyDIQdmonRcvlatNCVr8yK8Qj5mxvTAEs2JujhpOUytIGhSLOxmkRMSU5V0uSELArZ+fAz3RAqqkHl+HeOWL8CpnBBNHgN8WRBGnM9MBwmwQkueEUtDc84njxhzZJ9i7QBA+Kr6xG1YDoqHH0oA9ZQLma9D5Urn3NxgyNiXsU8q9gwf5aMZSl3GV9bfSBmuP9uNgGMEor5XO5EK62tC7hmVpNSB00LkkiVAsHQN15D19Q6h8cvHW1l6xfgh5jdNTzNjBYZF53W56k8SffaGMWVtoJfPLiPGw==]]></Encrypt></xml>";
+//        String xml = "<AppId><![CDATA[wx65d0706cc8ce663f]]></AppId>    <Encrypt><![CDATA[sGlp7h1fhRlb5ZzkW2mvUApy+8BuyIu/trJQ4RVPx9fJLaLDWu91cYbis8nQxQw1yZ51BIhTllLeb9g1bMQfcfQ/r/KgBS3iM0lYvtNbgXqNby8V0nN0CWRsVlk5//PGkXng+RX0jXp6z3CJrDk9+wPVhju3Wm6l2r5VYQV1+V2CN5g4AqKjsBJyDIQdmonRcvlatNCVr8yK8Qj5mxvTAEs2JujhpOUytIGhSLOxmkRMSU5V0uSELArZ+fAz3RAqqkHl+HeOWL8CpnBBNHgN8WRBGnM9MBwmwQkueEUtDc84njxhzZJ9i7QBA+Kr6xG1YDoqHH0oA9ZQLma9D5Urn3NxgyNiXsU8q9gwf5aMZSl3GV9bfSBmuP9uNgGMEor5XO5EK62tC7hmVpNSB00LkkiVAsHQN15D19Q6h8cvHW1l6xfgh5jdNTzNjBYZF53W56k8SffaGMWVtoJfPLiPGw==]]></Encrypt>";
+        XMLObject obj = SClass.convertXmlStrToObject(xml,XMLObject.class);
 
         String data = "cb50vdmpkUcOKg8HsPq3WMygnxv9f8hSJbzaZ+hKpeWuWFVwaehAyttnP1E6d6HLVTn+DNIGOYmebQE2TvsaW6QhMj35Q8X26iXDag1CLStSwH6n8oQnzmnbJpXDE7TDrgONU3LEmDtMBdYisovNday7rC8R07QqZcFznbGxtWqSAemGOUkdIlCpPihUkawcIm4mBFxdsKSZhAJSTxHYTr8eIUXT2FCPy+04VwMm/JDcMcsMu/udUxcEU6cMxj8kC3loHB0RH5g1H3+KOJuS/n9xhGyPkLuErbwHZfagRT1Y/zqX4Gt4ij7jQv6QtMzlYczFcB5bfhe0mVTg+HW5ymB5vNFh1h7y8DZa/CKdY9aR12qcFPBLy//wSquq1I0Swjsnfo9fbs5oUndHtYBwKRPpyGZK7ATQLInBis3D3/cnlXZif8K0r9rLcR2M/B99BhvjUzb8N+rQVRHhlHlE11GOj84EOM3tNBQtW2e/L2g=";
         Object aaa1111 = SAES.unCode7AES(data,"ufsQkm8++Up7h2h3n+zdYw==","rlhWmu8JLWlgbr9TIf9/Ow==");
