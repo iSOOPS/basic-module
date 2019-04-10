@@ -24,21 +24,8 @@
       <file leaf-file-name="MainTest.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/MainTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="630">
-              <caret line="57" column="44" selection-start-line="57" selection-start-column="44" selection-end-line="57" selection-end-column="44" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SClass.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/ssource/SClass.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1095">
-              <caret line="90" column="7" selection-start-line="90" selection-start-column="7" selection-end-line="90" selection-end-column="7" />
-              <folding>
-                <element signature="e#878#879#0" expanded="true" />
-                <element signature="e#915#916#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="45">
+              <caret line="3" selection-start-line="3" selection-end-line="3" />
             </state>
           </provider>
         </entry>
@@ -46,8 +33,20 @@
       <file leaf-file-name="pom.xml" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pom.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="240">
-              <caret line="16" column="16" lean-forward="true" selection-start-line="16" selection-start-column="16" selection-end-line="16" selection-end-column="16" />
+            <state relative-caret-position="120">
+              <caret line="8" column="16" selection-start-line="8" selection-start-column="16" selection-end-line="8" selection-end-column="16" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SHttp.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/ssource/SHttp.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="296">
+              <caret line="82" column="42" selection-start-line="82" selection-start-column="42" selection-end-line="82" selection-end-column="42" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -66,9 +65,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>creatIndex</find>
-      <find>content</find>
-      <find>e.printStackTrace();</find>
       <find>fields</find>
       <find>getList</find>
       <find>SEResultObject</find>
@@ -96,6 +92,9 @@
       <find>builderKey</find>
       <find>getBuilder</find>
       <find>sortBuilder</find>
+      <find>ela</find>
+      <find>elasticsearch</find>
+      <find>org.apache.http</find>
     </findStrings>
   </component>
   <component name="IdeDocumentHistory">
@@ -104,7 +103,6 @@
         <option value="$PROJECT_DIR$/src/main/java/com/redisRoom/redisBean/RequestClientBean.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/elasticsearchRoom/SEEConf.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/RoomConfig.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/ssource/SHttp.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/GLOBALSINGLETON.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/MainTestController.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/redissouce/redisBean/RedisBean.java" />
@@ -149,8 +147,9 @@
         <option value="$PROJECT_DIR$/src/main/java/com/elasticsearch/xcontent/SContentFace.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/elasticsearch/query/SElasticTerm.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/elasticsearch/SElastic.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/MainTest.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/ssource/SClass.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/MainTest.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/ssource/SHttp.java" />
         <option value="$PROJECT_DIR$/pom.xml" />
       </list>
     </option>
@@ -198,6 +197,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="PackagesPane" />
+      <pane id="AndroidView" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -236,15 +237,6 @@
               <item name="SServ" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="com" type="462c0819:PsiDirectoryNode" />
-              <item name="elasticsearch" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="SServ" type="b2602c69:ProjectViewProjectNode" />
-              <item name="SServ" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="resources" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -267,8 +259,6 @@
         </subPane>
       </pane>
       <pane id="Scope" />
-      <pane id="AndroidView" />
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -509,14 +499,15 @@
       <workItem from="1543826077271" duration="5000" />
       <workItem from="1543913322784" duration="571000" />
       <workItem from="1554887557663" duration="23000" />
+      <workItem from="1554888548071" duration="463000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="129894000" />
+    <option name="totallyTimeSpent" value="130357000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1292" y="-257" width="1908" height="1057" extended-state="0" />
+    <frame x="1282" y="-257" width="1908" height="1057" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
@@ -526,15 +517,15 @@
       <window_info anchor="bottom" id="Java Enterprise" order="9" sideWeight="0.49675852" weight="0.3298969" />
       <window_info anchor="right" id="Capture Analysis" order="7" />
       <window_info anchor="bottom" x="5" y="303" width="1260" height="216" id="Event Log" order="7" sideWeight="0.45342126" side_tool="true" weight="0.30508474" />
-      <window_info anchor="right" id="Maven Projects" order="4" weight="0.2636656" />
+      <window_info active="true" anchor="right" id="Maven Projects" order="4" visible="true" weight="0.2636656" />
       <window_info anchor="bottom" id="Database Changes" order="15" show_stripe_button="false" />
-      <window_info anchor="bottom" x="4" y="287" width="1276" height="249" id="Run" order="2" sideWeight="0.7301459" weight="0.34895834" />
+      <window_info anchor="bottom" x="4" y="287" width="1276" height="249" id="Run" order="2" sideWeight="0.7301459" visible="true" weight="0.34895834" />
       <window_info anchor="bottom" id="Version Control" order="13" show_stripe_button="false" sideWeight="0.49675852" weight="0.329927" />
       <window_info anchor="bottom" id="Spring" order="10" sideWeight="0.49675852" weight="0.3298969" />
       <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.49675852" weight="0.32941177" />
       <window_info id="Capture Tool" order="2" />
       <window_info anchor="right" id="Designer" order="5" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49791667" visible="true" weight="0.27599144" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.496875" visible="true" weight="0.27867097" />
       <window_info id="Web" order="4" side_tool="true" />
       <window_info anchor="right" id="Database" order="6" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.2497939" />
@@ -542,19 +533,19 @@
       <window_info id="UI Designer" order="3" />
       <window_info anchor="right" id="Theme Preview" order="8" />
       <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.5465787" weight="0.40625" />
-      <window_info active="true" id="Favorites" order="5" sideWeight="0.50208336" side_tool="true" visible="true" weight="0.27599144" />
+      <window_info id="Favorites" order="5" sideWeight="0.503125" side_tool="true" weight="0.27867097" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
+      <window_info anchor="bottom" id="Messages" order="12" sideWeight="0.4674361" weight="0.446875" />
       <window_info anchor="bottom" id="Thumbnails" order="14" weight="0.3298969" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.325" />
       <window_info id="Nl-Palette" order="7" />
       <window_info anchor="right" id="Properties" order="8" />
-      <window_info anchor="bottom" id="Messages" order="12" sideWeight="0.4674361" weight="0.446875" />
+      <window_info anchor="right" id="Coverage" order="8" side_tool="true" weight="0.329582" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Application Servers" order="8" sideWeight="0.49675852" weight="0.3298969" />
-      <window_info anchor="right" id="Coverage" order="8" side_tool="true" weight="0.329582" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -568,7 +559,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/com/MainTest.java</url>
-          <line>59</line>
+          <line>9</line>
           <properties />
           <option name="timeStamp" value="26" />
         </line-breakpoint>
@@ -581,6 +572,31 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/MainTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="630">
+          <caret line="57" column="44" selection-start-line="57" selection-start-column="44" selection-end-line="57" selection-end-column="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/ssource/SClass.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1095">
+          <caret line="90" column="7" selection-start-line="90" selection-start-column="7" selection-end-line="90" selection-end-column="7" />
+          <folding>
+            <element signature="e#878#879#0" expanded="true" />
+            <element signature="e#915#916#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="16" column="16" lean-forward="true" selection-start-line="16" selection-start-column="16" selection-end-line="16" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/MainTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="630">
@@ -727,21 +743,28 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/MainTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="630">
-          <caret line="57" column="44" selection-start-line="57" selection-start-column="44" selection-end-line="57" selection-end-column="44" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/ssource/SClass.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1095">
-          <caret line="90" column="7" selection-start-line="90" selection-start-column="7" selection-end-line="90" selection-end-column="7" />
+        <state relative-caret-position="358">
+          <caret line="51" column="13" lean-forward="true" selection-start-line="51" selection-start-column="13" selection-end-line="51" selection-end-column="13" />
           <folding>
             <element signature="e#878#879#0" expanded="true" />
             <element signature="e#915#916#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/elasticsearch/query/SElasticRange.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="9" column="13" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/elasticsearch/query/SElasticSingle.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="9" column="13" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
         </state>
       </provider>
     </entry>
@@ -752,10 +775,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/MainTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" selection-start-line="3" selection-end-line="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/ssource/SHttp.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="296">
+          <caret line="82" column="42" selection-start-line="82" selection-start-column="42" selection-end-line="82" selection-end-column="42" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="16" column="16" lean-forward="true" selection-start-line="16" selection-start-column="16" selection-end-line="16" selection-end-column="16" />
+        <state relative-caret-position="120">
+          <caret line="8" column="16" selection-start-line="8" selection-start-column="16" selection-end-line="8" selection-end-column="16" />
         </state>
       </provider>
     </entry>

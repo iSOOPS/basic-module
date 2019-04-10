@@ -5,8 +5,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.isoops.serv</groupId>
-  <artifactId>basic-module</artifactId>
-  <version>1.4.7</version>
+  <artifactId>basic-module-no-es</artifactId>
+  <version>1.5.1</version>
   <packaging>jar</packaging>
 
   <name>basic-module Maven Webapp</name>
@@ -145,17 +145,30 @@
       <version>2.9.0</version>
     </dependency>
 
-    <!--搜索引擎-->
-    <!-- https://mvnrepository.com/artifact/org.elasticsearch/elasticsearch -->
+    <!--&lt;!&ndash;搜索引擎&ndash;&gt;-->
+    <!--&lt;!&ndash; https://mvnrepository.com/artifact/org.elasticsearch/elasticsearch &ndash;&gt;-->
+    <!--<dependency>-->
+      <!--<groupId>org.elasticsearch</groupId>-->
+      <!--<artifactId>elasticsearch</artifactId>-->
+      <!--<version>6.4.2</version>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+      <!--<groupId>org.elasticsearch.client</groupId>-->
+      <!--<artifactId>transport</artifactId>-->
+      <!--<version>6.4.2</version>-->
+    <!--</dependency>-->
+
+    <!--网络-->
+    <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
     <dependency>
-      <groupId>org.elasticsearch</groupId>
-      <artifactId>elasticsearch</artifactId>
-      <version>6.4.2</version>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore</artifactId>
+      <version>4.4.3</version>
     </dependency>
     <dependency>
-      <groupId>org.elasticsearch.client</groupId>
-      <artifactId>transport</artifactId>
-      <version>6.4.2</version>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>4.5.2</version>
     </dependency>
 
     <dependency>
