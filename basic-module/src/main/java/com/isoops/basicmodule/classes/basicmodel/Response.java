@@ -1,0 +1,102 @@
+package com.isoops.basicmodule.classes.basicmodel;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.isoops.basicmodule.classes.ErrorTemp;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.io.Serializable;
+
+/**
+ * Created by samuel on 2018/6/21.
+ */
+@ApiModel(value = "Response",reference = "Response")
+@Setter
+@Getter
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class Response<T> implements Serializable {
+
+    @ApiModelProperty(value = "状态")
+    private Boolean state = true;
+    @ApiModelProperty(value = "状态描述")
+    private String msg;
+    @ApiModelProperty(value = "状态码")
+    private Integer stateCode = 200;
+    @ApiModelProperty(value = "是否有下一页")
+    private Boolean haveNext;
+    @ApiModelProperty(value = "分页总数量")
+    private Long pageCount;
+    @ApiModelProperty(value = "返回对象")
+    private T object;
+
+    public Response(){
+        setMsg(GenericEnum.SUCESS);
+    }
+    public Response(GenericEnum genericEnum){
+        setMsg(genericEnum);
+    }
+    public Response(T object){
+        setObject(object);
+        setMsg(GenericEnum.SUCESS);
+    }
+    public Response(T object, GenericEnum e){
+        setObject(object);
+        setMsg(e);
+    }
+    public Response(IPage<T> page){
+        setObject((T) page.getRecords());
+        setPageCount(getPageSizeCount(page.getTotal(),page.getSize()));
+        setHaveNext((page.getCurrent() + 1) < getPageCount());
+
+    }
+
+    private Long getPageSizeCount(Long allCount,Long pageSize){
+        if (allCount==null || pageSize == null){
+            return 0L;
+        }
+        float i = allCount%pageSize;
+        if (i == 0){
+            return allCount/pageSize;
+        }
+        return allCount/pageSize+1;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+
+    public void setMsg(GenericEnum genericEnum){
+        switch (genericEnum){
+            case FORMAT_ERROR:{
+                this.msg = ErrorTemp.DATA_FORMAT_ERROR;
+                break;
+            }
+            case ACTION_ERROR:{
+                this.msg = ErrorTemp.ACTION_FALE;
+                break;
+            }
+            case SYSTEM_ERROR:{
+                this.msg = ErrorTemp.SYSTEM_ERROR;
+                break;
+            }
+            case SIGN_ERROR:{
+                this.msg = ErrorTemp.SIGN_ERROR;
+                break;
+            }
+            case PERMISSION_ERROR:{
+                this.msg = ErrorTemp.PERMISSION_FALE;
+                break;
+            }
+            case REPETITION_ERROR:{
+                this.msg = ErrorTemp.REPETITION_ERROR;
+                break;
+            }
+        }
+    }
+
+
+
+}
