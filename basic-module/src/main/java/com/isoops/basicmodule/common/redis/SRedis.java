@@ -1,9 +1,9 @@
-package com.isoops.basicmodule.redis;
+package com.isoops.basicmodule.common.redis;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.isoops.basicmodule.redis.source.RedisLock;
-import com.isoops.basicmodule.redis.source.RedisUtil;
+import com.isoops.basicmodule.common.redis.source.RedisLock;
+import com.isoops.basicmodule.common.redis.source.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

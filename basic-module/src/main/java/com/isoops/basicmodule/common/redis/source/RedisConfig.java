@@ -1,4 +1,4 @@
-package com.isoops.basicmodule.redis.source;
+package com.isoops.basicmodule.common.redis.source;
 
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;

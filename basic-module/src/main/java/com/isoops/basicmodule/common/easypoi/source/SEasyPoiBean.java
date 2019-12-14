@@ -1,4 +1,4 @@
-package com.isoops.basicmodule.source.easypoi;
+package com.isoops.basicmodule.common.easypoi.source;
 
 import lombok.Data;
 

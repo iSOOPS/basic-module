@@ -3,7 +3,7 @@ package com.isoops.basicmodule.classes.annotation;
 
 import com.isoops.basicmodule.classes.annotation.source.BasicContract;
 import com.isoops.basicmodule.classes.annotation.source.InterceptorException;
-import com.isoops.basicmodule.redis.SRedis;
+import com.isoops.basicmodule.common.redis.SRedis;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;

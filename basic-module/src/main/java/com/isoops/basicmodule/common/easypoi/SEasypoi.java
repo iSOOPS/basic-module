@@ -1,4 +1,4 @@
-package com.isoops.basicmodule.source;
+package com.isoops.basicmodule.common.easypoi;
 
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.ExcelImportUtil;
@@ -6,7 +6,7 @@ import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.afterturn.easypoi.excel.entity.ImportParams;
 import cn.afterturn.easypoi.excel.entity.enmus.ExcelType;
 import cn.afterturn.easypoi.excel.entity.params.ExcelExportEntity;
-import com.isoops.basicmodule.source.easypoi.SEasyPoiBean;
+import com.isoops.basicmodule.common.easypoi.source.SEasyPoiBean;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.web.multipart.MultipartFile;

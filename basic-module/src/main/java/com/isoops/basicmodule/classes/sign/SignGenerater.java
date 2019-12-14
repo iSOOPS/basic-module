@@ -2,7 +2,7 @@ package com.isoops.basicmodule.classes.sign;
 
 import com.isoops.basicmodule.source.SAES;
 import com.isoops.basicmodule.source.SUUIDGenerater;
-import com.isoops.basicmodule.redis.SRedis;
+import com.isoops.basicmodule.common.redis.SRedis;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

@@ -1,4 +1,4 @@
-package com.isoops.basicmodule.redis.source;
+package com.isoops.basicmodule.common.redis.source;
 
 import io.protostuff.LinkedBuffer;
 import io.protostuff.ProtostuffIOUtil;
