@@ -38,12 +38,12 @@ public class SignGenerater {
     private SAES saes;
     /**
      * 创建一个code
-     * @param request 请求头
+     * @param request 请求头.replace(".","")
      * @param userSignal 用户的标示
      * @return f
      */
     public String codeCreater(HttpServletRequest request, String userSignal){
-        String ip = request.getRemoteAddr().replace(".","");
+        String ip = request.getRemoteAddr().replace(".","").replace(":","");
         String codeBasic = userSignal+ip;
         return saes.encrypt("wwwISOOPScom5464",codeBasic);
     }

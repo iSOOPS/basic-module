@@ -1,7 +1,6 @@
 package com.isoops.basicmodule.classes.annotation;
 
 import com.alibaba.fastjson.JSON;
-import com.isoops.basicmodule.SpringBootGlobalUtil;
 import com.isoops.basicmodule.classes.annotation.source.BasicContract;
 import com.isoops.basicmodule.classes.annotation.source.InterceptorException;
 import com.isoops.basicmodule.classes.basicmodel.GenericEnum;
@@ -51,38 +50,27 @@ public class CheckRequestContract extends BasicContract {
     }
 
     private void checkAction(HttpServletRequest request, Request bean, CheckGradeEnum level){
-        //测试环境返回成功
-        if (SpringBootGlobalUtil.getActiveProfile().equals("release")||
-                SpringBootGlobalUtil.getActiveProfile().equals("RELEASE")) {
-            switch (level) {
-                case codeCheck: {
-                    if (!signGenerater.checkCode(bean.getCode(),request,bean.getUserSignal())) {
-                        try {
-                            throw new InterceptorException(new Response<>(GenericEnum.SIGN_ERROR).getMsg());
-                        } catch (InterceptorException e) {
-                            e.printStackTrace();
-                        }
+        switch (level) {
+            case codeCheck: {
+                if (!signGenerater.checkCode(bean.getCode(),request,bean.getUserSignal())) {
+                    try {
+                        throw new InterceptorException(new Response<>(GenericEnum.SIGN_ERROR).getMsg());
+                    } catch (InterceptorException e) {
+                        e.printStackTrace();
                     }
-                    break;
                 }
-                case signCheck: {
-                    if (!signGenerater.checkSign(bean.getSign(),bean.getCode())) {
-                        try {
-                            throw new InterceptorException(new Response<>(GenericEnum.SIGN_ERROR).getMsg());
-                        } catch (InterceptorException e) {
-                            e.printStackTrace();
-                        }
+                break;
+            }
+            case signCheck: {
+                if (!signGenerater.checkSign(bean.getSign(),bean.getCode())) {
+                    try {
+                        throw new InterceptorException(new Response<>(GenericEnum.SIGN_ERROR).getMsg());
+                    } catch (InterceptorException e) {
+                        e.printStackTrace();
                     }
-                    break;
                 }
+                break;
             }
         }
     }
-
-
-
-
-
-
-
 }
