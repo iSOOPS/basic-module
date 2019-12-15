@@ -7,6 +7,7 @@ import com.isoops.basicmodule.classes.annotation.source.LoggerEnum;
 import com.isoops.basicmodule.classes.basicmodel.GenericEnum;
 import com.isoops.basicmodule.classes.basicmodel.Request;
 import com.isoops.basicmodule.classes.basicmodel.Response;
+import com.isoops.basicmodule.source.SClass;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -48,12 +49,11 @@ public class LoggerContract extends BasicContract {
             return;
         }
         HttpServletRequest request = attributes.getRequest();
-        Request bean = GetArgsModel(joinPoint);
-        if (bean == null){
-            try {
-                throw new InterceptorException(new Response<>(GenericEnum.FORMAT_ERROR).getMsg());
-            } catch (InterceptorException e) {
-                e.printStackTrace();
+        Object logRequest = GetArgsModel(joinPoint);
+        if (logRequest == null){
+            logRequest = GetArgsStringData(joinPoint);
+            if (SClass.isBlank(logRequest)){
+                logRequest = "无法识别request数据";
             }
         }
         log.info("==================START REQUEST[Desc:+"+ req.msg() +"]=================");
@@ -72,7 +72,7 @@ public class LoggerContract extends BasicContract {
                 heads = heads + headName + "={" + headValue + "}; ";
             }
             log.info("REQUEST-HEAD:" + heads);
-            log.info("REQUEST:"+JSON.toJSONString(bean));
+            log.info("REQUEST:"+JSON.toJSONString(logRequest));
         }
     }
 

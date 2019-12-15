@@ -1,7 +1,5 @@
 package com.isoops.basicmodule.source;
 
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.beanutils.PropertyUtils;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
@@ -15,6 +13,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.beanutils.PropertyUtils;
+import org.springframework.beans.BeanUtils;
 /**
  * Created by samuel on 2017/6/22.
  */
@@ -83,7 +83,7 @@ public class SBean {
         }
         try {
             T bean = t.newInstance();
-            BeanUtils.populate(bean, map);
+            org.apache.commons.beanutils.BeanUtils.populate(bean, map);
             return bean;
         } catch (Exception e) {
             return null;
@@ -156,13 +156,10 @@ public class SBean {
         } catch (InstantiationException | IllegalAccessException e) {
             return null;
         }
-        try {
-            PropertyUtils.copyProperties(newBean, bean);
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            return null;
-        }
+        BeanUtils.copyProperties(bean,newBean);
         return newBean;
     }
+
 
     public static <T> List<T> beansToBeans(List list, Class<T> t) {
         List<T> resultList = new ArrayList<>();

@@ -46,6 +46,8 @@ public class SRedis {
         redisUtil.setEx(key,(obj instanceof String) ? (String) obj : JSON.toJSONString(obj),time,unit);
     }
 
+
+
     public String get(String key){
         if (key == null || key.equals("")){
             return null;

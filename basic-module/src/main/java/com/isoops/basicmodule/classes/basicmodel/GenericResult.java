@@ -5,6 +5,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.net.URLEncoder;
 
 @Slf4j
 public class GenericResult <T> extends ResponseEntity<Response<T>> {
@@ -29,33 +30,23 @@ public class GenericResult <T> extends ResponseEntity<Response<T>> {
         return success(response);
     }
 
-    public static ResponseEntity export(File file) {
+    public static ResponseEntity export(File file,HttpHeaders httpHeaders,MediaType mediaType) {
         if (file == null){
             return fail(new Response<>(GenericEnum.SYSTEM_ERROR));
         }
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-        headers.add("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"");
-        headers.add("Pragma", "no-cache");
-        headers.add("Expires", "0");
-
         GenericResult.BodyBuilder bodyBuilder = GenericResult.ok()
-                .headers(headers)
+                .headers(httpHeaders)
                 .contentLength(file.length())
-                .contentType(MediaType.parseMediaType("application/octet-stream"));
+                .contentType(mediaType);
         return bodyBuilder.body(new FileSystemResource(file));
     }
 
-    public static ResponseEntity export(byte[] bytes, String fileName) {
+    public static ResponseEntity export(byte[] bytes, HttpHeaders httpHeaders) {
         if (bytes == null){
             return fail(new Response<>(GenericEnum.SYSTEM_ERROR));
         }
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-        headers.add("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
-        headers.add("Pragma", "no-cache");
-        headers.add("Expires", "0");
-        return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
+        return new ResponseEntity<>(bytes, httpHeaders, HttpStatus.OK);
+
     }
 
 }

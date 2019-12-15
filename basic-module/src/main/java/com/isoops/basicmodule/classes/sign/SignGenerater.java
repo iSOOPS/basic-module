@@ -1,6 +1,7 @@
 package com.isoops.basicmodule.classes.sign;
 
 import com.isoops.basicmodule.source.SAES;
+import com.isoops.basicmodule.source.SMD5;
 import com.isoops.basicmodule.source.SUUIDGenerater;
 import com.isoops.basicmodule.common.redis.SRedis;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +35,6 @@ public class SignGenerater {
         return uuid;
     }
 
-    @Autowired
-    private SAES saes;
     /**
      * 创建一个code
      * @param request 请求头.replace(".","")
@@ -45,7 +44,7 @@ public class SignGenerater {
     public String codeCreater(HttpServletRequest request, String userSignal){
         String ip = request.getRemoteAddr().replace(".","").replace(":","");
         String codeBasic = userSignal+ip;
-        return saes.encrypt("wwwISOOPScom5464",codeBasic);
+        return SMD5.enCode2MD5(codeBasic);
     }
 
     public boolean checkCode(String code, HttpServletRequest request, String userSignal){
