@@ -12,7 +12,7 @@ import java.io.Serializable;
 /**
  * Created by samuel on 2018/6/14.
  */
-@ApiModel(value = "RequestModel",reference = "RequestModel")
+@ApiModel(value = "Request",reference = "Request")
 @Data
 public class Request<T> implements Serializable {
 

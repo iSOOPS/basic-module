@@ -35,9 +35,77 @@ public class ExcelToolApplication {
 		}
 }
 ```
-
+如果有多个需要Scan的Component包，则：
+```java
+@ComponentScan(basePackages = {"com.isoops.basicmodule","你的包路径"})
+```
 #### 使用说明
 
+###### 注解@Logger/@ControllerLock/@CheckRequest/@CheckRequestUrl使用
+@Logger 接口日志打印（包含基本request参数/请求参数/返回Response参数/接口运行时长）
+
+@ControllerLock 防止暴力请求 如下每米可请求次数为10次 超过则自动拦截并报错（默认为每秒1次请求）
+
+@CheckRequest 基于Request/Response封装组件的签名校验
+
+@CheckRequestUrl 基于url带参的签名校验，可自定义校验参数名称
+
+```html
+    window.local.herf = "localhost:8080/uploadExcel?upCode='111'&upSign='222'&userId='name'";
+```
+
+```java
+    @Logger(msg = "Excel文件上传")
+    //防止暴力请求 如下每米可请求次数为10次 超过则自动拦截并报错（默认为每秒1次请求）
+    @ControllerLock(seconds = 1,maxCount = 10)
+    @CheckRequestUrl(codeKey = "upCode",signKey = "upSign",userSignalKey = "userId",level = CheckGradeEnum.signCheck)
+    @ApiOperation(value = "Excel文件上传", notes = "Excel文件上传")
+    @PostMapping("/uploadExcel")
+    public GenericResult<Integer> uploadCustomProperty(@RequestParam("file") List<MultipartFile> files){
+        return GenericResult.recome( service.uploadCustomProperty(files));
+    }
+```
+
+###### 基础Controller使用
+
+1.常规接口请求，遵循Requset/Response基本数据结构
+
+2.封装了ResponseEntity结构GenericResult,支持recome/export方法,分别对应对象json-response 和 文件(file)下载
+
+Request请求对象
+```java
+    @ApiModelProperty(value = "加密签名key码", required = true)
+    @NotBlank(message = ErrorTemp.NOT_NULL)
+    private String code;
+
+    @ApiModelProperty(value = "加密签名", required = true)
+    @NotBlank(message = "sign不能为空")
+    private String sign;
+
+    @ApiModelProperty(value = "用户标示", required = true)
+    @NotBlank(message = ErrorTemp.NOT_NULL)
+    private String userSignal;
+
+    @ApiModelProperty(value = "数据对象", required = true)
+    @Valid
+    private T object;
+```
+Response返回对象
+```java
+    @ApiModelProperty(value = "状态")
+    private Boolean state;
+    @ApiModelProperty(value = "状态描述")
+    private String msg;
+    @ApiModelProperty(value = "状态码")
+    private Integer stateCode;
+    @ApiModelProperty(value = "是否有下一页")
+    private Boolean haveNext;
+    @ApiModelProperty(value = "分页总数量")
+    private Long pageCount;
+    @ApiModelProperty(value = "返回对象")
+    private T object;
+```
+Controller书写
 ```java
 //注解签名校验使用的是@Controller拦截条件，此处不可使用RestController
 @Controller
@@ -47,21 +115,12 @@ public class UserController {
 
     @Autowired
     private UserService service;
-
-    @Autowired
-    private SRedis sRedis;
-
-    //打印Request/Response日志,包含基本信息与接口执行时间
-    @Logger
-    //防止暴力请求
+    
+    @Logger(msg = "登录")
     @ControllerLock
-    //签名校验
-    @CheckRequest(level = CheckGradeEnum.signCheck)
     @ApiOperation(value = "登录", notes = "登录")
     @PostMapping("login")
-    //封装Request了基础结构
-    //封装了ResponseEntity结构,支持recome/export方法,分别为对象json response和文件下载
-    public GenericResult<String> login(@RequestBody @Valid Request<Login> bean) {
+    public GenericResult<LoginResponseBean> login(@RequestBody @Valid Request<Login> bean) {
         return GenericResult.recome(
                 service.login(
                         bean.getObject().getAccount(),
@@ -69,26 +128,19 @@ public class UserController {
                 ));
     }
 
+    @CheckRequestUrl
     @ControllerLock(seconds = 1,maxCount = 10)
-    @Logger(msg = "Excel文件下载")
-    @CheckRequest(level = CheckGradeEnum.signCheck)
-    @PostMapping("downloadExcel")
-    @ApiOperation(value = "Excel文件下载", notes = "Excel文件下载")
-    public GenericResult visitorOpenDevice(@RequestBody @Valid Request bean) {
-
-        sRedis.lockKey("user",10);
-        sRedis.set("user",bean.getUserSignal());
-        UserDetail userDetail = sRedis.get(bean.getUserSignal()+"_DETAIL",UserDetail.class);
-
-        byte[] bytes = SEasypoi.exportExcelByte(
-                Arrays.asList(userDetail),
-                "title",
-                "sheet",
-                UserDetail.class);
-        return (GenericResult) GenericResult.export(bytes,"test.xls");
+    @GetMapping("/download")
+    public ResponseEntity download(@RequestParam("local_date")  String localDate,
+                                   @RequestParam("method")  Integer method) throws InterceptorException {
+        byte[] bytes = service.getUserListExcel(localDate,method);
+        HttpHeaders headers = service.getHeaders();
+        return GenericResult.export(bytes,headers);
     }
+
 }
 ```
+
 
 #### 参与贡献
 
