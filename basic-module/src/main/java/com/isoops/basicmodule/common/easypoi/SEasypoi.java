@@ -71,7 +71,7 @@ public class SEasypoi {
 
     /**输出byte[]**/
     public static byte[] exportExcelByte(List<ExcelExportEntity> list,
-                                        List<Map> mapDatas ,
+                                         List<Map<String, Object>> mapDatas ,
                                         String title,
                                         String sheetName,
                                         boolean isCreateHeader){

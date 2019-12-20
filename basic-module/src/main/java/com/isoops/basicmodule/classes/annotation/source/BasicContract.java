@@ -4,6 +4,7 @@ import com.isoops.basicmodule.classes.basicmodel.Request;
 import org.aspectj.lang.JoinPoint;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Enumeration;
 
 public class BasicContract {
 
@@ -17,14 +18,32 @@ public class BasicContract {
         return null;
     }
 
-    protected String GetArgsStringData(JoinPoint joinPoint){
-        Object[] args = joinPoint.getArgs();
-        for (int i = 0; i < args.length; i++) {
-            if (args[i] instanceof String){
-                return (String) args[i];
+    protected Request GetArgsWithUrl(HttpServletRequest request, String codeKey,String signKey,String userSignalKey){
+        Request bean = new Request();
+        Enumeration enu = request.getParameterNames();
+        while (enu.hasMoreElements()) {
+            String paraName = (String) enu.nextElement();
+            if (paraName.equals(codeKey)){
+                bean.setCode(request.getParameter(paraName));
+            }
+            if (paraName.equals(signKey)){
+                bean.setSign(request.getParameter(paraName));
+            }
+            if (paraName.equals(userSignalKey)){
+                bean.setUserSignal(request.getParameter(paraName));
             }
         }
-        return null;
+        return bean;
+    }
+
+    protected String GetUrlParameter(HttpServletRequest request){
+        String url = request.getRequestURL().toString() + "?";
+        Enumeration enu = request.getParameterNames();
+        while (enu.hasMoreElements()) {
+            String paraName = (String) enu.nextElement();
+            url = url + paraName + "=" + request.getParameter(paraName) + "&";
+        }
+        return url.substring(0,url.length()-1);
     }
 
     //获取真实的ip

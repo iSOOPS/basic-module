@@ -6,14 +6,12 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.BeanUtils;
 /**
  * Created by samuel on 2017/6/22.
@@ -190,6 +188,19 @@ public class SBean {
             }
         }
         return newBean;
+    }
+
+    /**
+     * 替换map中null成空字符串
+     */
+    public static Map<String,Object> replaceMapNullToEmpty(Map<String,Object> map){
+        Set<Map.Entry<String, Object>> entries = map.entrySet();
+        for (Map.Entry<String,Object> entry:entries){
+            if (entry.getValue() == null){
+                entry.setValue("");
+            }
+        }
+        return map;
     }
 
     /**

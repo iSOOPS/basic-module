@@ -12,6 +12,11 @@ import java.lang.annotation.*;
 public @interface CheckRequest {
 
     /**
+     * 是否暂停使用
+     */
+    boolean ignore() default false;
+
+    /**
      * 校验等级
      */
     CheckGradeEnum level() default CheckGradeEnum.signCheck;

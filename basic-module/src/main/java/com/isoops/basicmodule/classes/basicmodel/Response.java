@@ -38,6 +38,13 @@ public class Response<T> implements Serializable {
         this.stateCode = 200;
     }
 
+    public Response(GenericEnum genericEnum){
+        this.state = genericEnum == GenericEnum.SUCESS;
+        this.stateCode = genericEnum == GenericEnum.SUCESS ? 200 : 500;
+        setMsgGeneric(genericEnum);
+    }
+
+
     public Response(String msg,GenericEnum genericEnum){
         this.state = genericEnum == GenericEnum.SUCESS;
         this.stateCode = genericEnum == GenericEnum.SUCESS ? 200 : 500;

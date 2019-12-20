@@ -1,6 +1,5 @@
 package com.isoops.basicmodule.classes.sign;
 
-import com.isoops.basicmodule.source.SAES;
 import com.isoops.basicmodule.source.SMD5;
 import com.isoops.basicmodule.source.SUUIDGenerater;
 import com.isoops.basicmodule.common.redis.SRedis;
@@ -61,9 +60,11 @@ public class SignGenerater {
         if (!sRedis.checkKey(code)){
             return false;
         }
-        if (sign == sRedis.get(code,null)){
-            return true;
-        }
-        return false;
+        return sign.equals(sRedis.get(code));
+    }
+
+    public boolean cleanSign(String code){
+        sRedis.delete(code);
+        return true;
     }
 }

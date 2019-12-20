@@ -38,7 +38,7 @@ public class LoggerContract extends BasicContract {
         if (req.logType() != LoggerEnum.ONLY_REQUEST) {
             log.info("RESPONSE:"+JSON.toJSONString(result));
         }
-        log.info("TIME:"+(System.currentTimeMillis()-startTime)+"/s");
+        log.info("TIME:"+(System.currentTimeMillis()-startTime)/1000+"/s");
         return result;
     }
 
@@ -51,7 +51,7 @@ public class LoggerContract extends BasicContract {
         HttpServletRequest request = attributes.getRequest();
         Object logRequest = GetArgsModel(joinPoint);
         if (logRequest == null){
-            logRequest = GetArgsStringData(joinPoint);
+            logRequest = GetUrlParameter(request);
             if (SClass.isBlank(logRequest)){
                 logRequest = "无法识别request数据";
             }
