@@ -10,16 +10,19 @@
 	</parent>
 	<groupId>com.isoops</groupId>
 	<artifactId>basic-module</artifactId>
-	<version>2.0.0</version>
+	<version>2.0.4</version>
 	<name>basic-module</name>
 	<description>basic-module project for Spring Boot</description>
 
     <distributionManagement>
         <repository>
-            <id>nexus-rs</id>
-            <name>Nexus Release Snapshot Repository</name>
-            <url>http://ssl-api.isoops.com/repository/local/</url>
+            <id>rdc-releases</id>
+            <url>https://packages.aliyun.com/maven/repository/2015536-release-UkrkIF/</url>
         </repository>
+        <snapshotRepository>
+            <id>rdc-snapshots</id>
+            <url>https://packages.aliyun.com/maven/repository/2015536-snapshot-nqsGxz/</url>
+        </snapshotRepository>
     </distributionManagement>
 
 

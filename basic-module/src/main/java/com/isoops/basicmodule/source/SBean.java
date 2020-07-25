@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.BeanUtils;
@@ -72,8 +73,6 @@ public class SBean {
         }
         return result.toString();
     }
-
-
 
     public static <T> T mapToBean(Map map, Class<T> t) {
         if (map == null || t == null) {

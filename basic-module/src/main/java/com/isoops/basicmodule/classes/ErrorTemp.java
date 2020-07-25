@@ -18,5 +18,6 @@ public class ErrorTemp {
     final public static String REPETITION_ERROR = "操作过于频繁，请等待响应或重新请求";
     final public static String CHECKCODE_ERROR = "验证码错误";
     final public static String NOT_NULL = "不能为空";
+    final public static String DATABASE_ERROR = "数据库异常";
 
 }

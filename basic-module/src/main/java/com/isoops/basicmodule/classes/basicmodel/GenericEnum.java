@@ -13,5 +13,6 @@ public enum  GenericEnum {
     SIGN_ERROR,             //签名异常
     PERMISSION_ERROR,       //权限异常
     REPETITION_ERROR,       //操作过于频繁，请等待响应或重新请求
+    DATABASE_ERROR,         //数据库异常
 
 }

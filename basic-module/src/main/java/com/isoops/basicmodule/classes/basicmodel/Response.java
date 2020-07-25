@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by samuel on 2018/6/21.
@@ -61,13 +62,18 @@ public class Response<T> implements Serializable {
 
     public Response(IPage<T> page){
         this.object = (T) page.getRecords();
-        this.pageCount = getPageSizeCount(page.getTotal(),page.getSize());
+        this.pageCount = page.getPages();
         this.haveNext = (page.getCurrent() + 1) < getPageCount();
         setMsgGeneric(GenericEnum.SUCESS);
         this.state = true;
         this.stateCode = 200;
     }
 
+    public Response<T> toPage(IPage page){
+        this.pageCount = page.getPages();
+        this.haveNext = (page.getCurrent() + 1) <= page.getPages();
+        return this;
+    }
 
 
     private Long getPageSizeCount(Long allCount,Long pageSize){
