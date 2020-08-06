@@ -360,4 +360,31 @@ public class SBean {
         }
         return true;
     }
+
+    public static void descartes(List<List<T>> targetList,
+                                 List<List<T>> result,
+                                 int layer,
+                                 List<T> curList) {
+        if (layer < targetList.size() - 1) {
+            if (targetList.get(layer).size() == 0) {
+                descartes(targetList, result, layer + 1, curList);
+            } else {
+                for (int i = 0; i < targetList.get(layer).size(); i++) {
+                    List<T> list = new ArrayList<T>(curList);
+                    list.add(targetList.get(layer).get(i));
+                    descartes(targetList, result, layer + 1, list);
+                }
+            }
+        } else if (layer == targetList.size() - 1) {
+            if (targetList.get(layer).size() == 0) {
+                result.add(curList);
+            } else {
+                for (int i = 0; i < targetList.get(layer).size(); i++) {
+                    List<T> list = new ArrayList<T>(curList);
+                    list.add(targetList.get(layer).get(i));
+                    result.add(list);
+                }
+            }
+        }
+    }
 }

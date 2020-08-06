@@ -3,6 +3,7 @@ package com.isoops.basicmodule.source;
 
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.formula.functions.T;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -233,6 +234,17 @@ public class SClass{
         return numStr.toString();
     }
 
+    public static String randomLetterString(int length){
+        String str="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/:_!@#$%^&";
+        Random random=new Random();
+        StringBuffer sb=new StringBuffer();
+        for(int i=0;i<length;i++){
+            int number=random.nextInt(72);
+            sb.append(str.charAt(number));
+        }
+        return sb.toString();
+    }
+
     /**
      * 获取一个随机数数组(数字均不一致)
      * @param size 数组数量
@@ -304,4 +316,9 @@ public class SClass{
             return source;
         }
     }
+
+
+
+
+
 }

@@ -75,7 +75,6 @@ public class Response<T> implements Serializable {
         return this;
     }
 
-
     private Long getPageSizeCount(Long allCount,Long pageSize){
         if (allCount==null || pageSize == null){
             return 0L;
