@@ -116,7 +116,7 @@ public class SBean {
     }
 
 
-    public static <T> List<T> beansToBeans(List<T> list, Class<T> t) {
+    public static <T> List<T> beansToBeans(List<?> list, Class<T> t) {
         List<T> resultList = new ArrayList<>();
         if (list == null || t == null) {
             return resultList;
