@@ -1,5 +1,7 @@
 package com.isoops.basicmodule.source;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -174,21 +176,17 @@ public class SBean {
     /**
      * 获取数组里对象的某个字段，重新组成数组
      */
-    public static<T> List<Object> getValueToList(List<T> basicList, String key) {
-        List<Object> resultList = new ArrayList<>();
-        if (basicList == null) return resultList;
+    public static<T> List<T> getValueToList(List<?> basicList, String key) {
+        List<T> resultList = new ArrayList<>();
+        if (basicList == null) {
+            return resultList;
+        }
+        Type type = ((ParameterizedType)resultList.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
         for (Object obj : basicList) {
-            if (obj instanceof String) {
-                return resultList;
-            } else if (obj instanceof Integer) {
-                return resultList;
-            } else if (obj instanceof Long) {
-                return resultList;
-            } else {
-                Map<String, Object> map = SBean.beanToMap(obj);
-                if (map.get(key) != null) {
-                    resultList.add(map.get(key));
-                }
+            Map<String, Object> map = SBean.beanToMap(obj);
+            if (map.get(key)!=null && map.get(key).getClass() == type){
+                T objs = (T) map.get(key);
+                resultList.add(objs);
             }
         }
         return resultList;
