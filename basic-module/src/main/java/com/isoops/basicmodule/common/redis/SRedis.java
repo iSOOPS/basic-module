@@ -66,7 +66,7 @@ public class SRedis {
         return JSON.parseObject(value,tClass);
     }
 
-    public <T>List<Object> getList(String key, Class<Object> tClass){
+    public <T>List<T> getList(String key, Class<T> tClass){
         if (key == null || key.equals("")){
             return null;
         }
