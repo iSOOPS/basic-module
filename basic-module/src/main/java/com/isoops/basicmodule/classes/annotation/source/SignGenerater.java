@@ -1,4 +1,4 @@
-package com.isoops.basicmodule.classes.sign;
+package com.isoops.basicmodule.classes.annotation.source;
 
 import com.isoops.basicmodule.source.SMD5;
 import com.isoops.basicmodule.source.SUUIDGenerater;

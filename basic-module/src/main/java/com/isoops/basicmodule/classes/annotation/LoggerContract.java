@@ -2,11 +2,7 @@ package com.isoops.basicmodule.classes.annotation;
 
 import com.alibaba.fastjson.JSON;
 import com.isoops.basicmodule.classes.annotation.source.BasicContract;
-import com.isoops.basicmodule.classes.annotation.source.InterceptorException;
 import com.isoops.basicmodule.classes.annotation.source.LoggerEnum;
-import com.isoops.basicmodule.classes.basicmodel.GenericEnum;
-import com.isoops.basicmodule.classes.basicmodel.Request;
-import com.isoops.basicmodule.classes.basicmodel.Response;
 import com.isoops.basicmodule.source.SClass;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -33,7 +29,7 @@ public class LoggerContract extends BasicContract {
     @Around("log() && @annotation(req)")
     public Object doAround(ProceedingJoinPoint joinPoint, final Logger req) throws Throwable {
         long startTime=System.currentTimeMillis();
-        Object result=joinPoint.proceed();
+        Object result = joinPoint.proceed();
         log.info("==================START RESPONSE[Desc:+"+ req.msg() +"]=================");
         if (req.logType() != LoggerEnum.ONLY_REQUEST) {
             log.info("RESPONSE:"+JSON.toJSONString(result));

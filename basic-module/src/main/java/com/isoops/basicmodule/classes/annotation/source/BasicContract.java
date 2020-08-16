@@ -8,28 +8,28 @@ import java.util.Enumeration;
 
 public class BasicContract {
 
-    protected Request GetArgsModel(JoinPoint joinPoint){
+    protected Request<?> GetArgsModel(JoinPoint joinPoint){
         Object[] args = joinPoint.getArgs();
-        for (int i = 0; i < args.length; i++) {
-            if (args[i] instanceof Request){
-                return (Request) args[i];
+        for (Object arg : args) {
+            if (arg instanceof Request) {
+                return (Request) arg;
             }
         }
         return null;
     }
 
-    protected Request GetArgsWithUrl(HttpServletRequest request, String codeKey,String signKey,String userSignalKey){
-        Request bean = new Request();
-        Enumeration enu = request.getParameterNames();
+    protected Request<?> GetArgsWithUrl(HttpServletRequest request){
+        Request<?> bean = new Request<>();
+        Enumeration<String> enu = request.getParameterNames();
         while (enu.hasMoreElements()) {
-            String paraName = (String) enu.nextElement();
-            if (paraName.equals(codeKey)){
+            String paraName = enu.nextElement();
+            if (paraName.equals("code")){
                 bean.setCode(request.getParameter(paraName));
             }
-            if (paraName.equals(signKey)){
+            if (paraName.equals("sign")){
                 bean.setSign(request.getParameter(paraName));
             }
-            if (paraName.equals(userSignalKey)){
+            if (paraName.equals("userSignal")){
                 bean.setUserSignal(request.getParameter(paraName));
             }
         }
@@ -37,11 +37,11 @@ public class BasicContract {
     }
 
     protected String GetUrlParameter(HttpServletRequest request){
-        String url = request.getRequestURL().toString() + "?";
-        Enumeration enu = request.getParameterNames();
+        StringBuilder url = new StringBuilder(request.getRequestURL().toString() + "?");
+        Enumeration<String> enu = request.getParameterNames();
         while (enu.hasMoreElements()) {
             String paraName = (String) enu.nextElement();
-            url = url + paraName + "=" + request.getParameter(paraName) + "&";
+            url.append(paraName).append("=").append(request.getParameter(paraName)).append("&");
         }
         return url.substring(0,url.length()-1);
     }
