@@ -35,7 +35,7 @@ public class Request<T> implements Serializable {
     private Integer pageIndex;
 
     @ApiModelProperty(value = "分页size")
-    private Integer pageSize;
+    private Integer pageSize = 10;
 
     @ApiModelProperty(value = "渠道", required = true)
     private Integer channel;

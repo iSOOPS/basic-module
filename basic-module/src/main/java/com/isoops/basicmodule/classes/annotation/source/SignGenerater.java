@@ -23,7 +23,7 @@ public class SignGenerater {
      * @return f
      */
     public String signCreater(String code, Long validityTime, TimeUnit unit){
-        if (code == null || code == ""){
+        if (code == null || code.equals("")){
             return null;
         }
         validityTime = validityTime == null ? 2 : validityTime;
