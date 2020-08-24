@@ -12,8 +12,6 @@ public class SException extends Exception {
         super("unkown error");
     }
 
-
-
     public SException(GenericEnum genericEnum) {
         super(genericEnum.getReasonPhrase());
         this.setGenericEnum(genericEnum);

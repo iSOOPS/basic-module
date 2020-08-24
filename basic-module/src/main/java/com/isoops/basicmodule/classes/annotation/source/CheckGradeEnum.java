@@ -6,6 +6,7 @@ package com.isoops.basicmodule.classes.annotation.source;
 public enum CheckGradeEnum {
     NO_CHECK,
     LOCK,
-    CODE_CHECK,
+    LOCK_CHECK,
     SIGN_CHECK,
+    HIGHLEVEL_SIGN_CHECK,
 }

@@ -1,6 +1,7 @@
 package com.isoops.basicmodule.classes.annotation;
 
 import com.isoops.basicmodule.classes.annotation.source.BasicContract;
+import com.isoops.basicmodule.classes.annotation.source.CheckGradeEnum;
 import com.isoops.basicmodule.classes.interceptor.SException;
 import com.isoops.basicmodule.classes.basicmodel.GenericEnum;
 import com.isoops.basicmodule.classes.basicmodel.Request;
@@ -78,28 +79,30 @@ public class CheckRequestContract extends BasicContract {
             case NO_CHECK:{
                 break;
             }
-            case LOCK:{
+            case LOCK:
+            case LOCK_CHECK:{
                 String ip = GetIpAddr(request);
-                String interfaceName = request.getRequestURI();
-                String key = "REQ_LIMINT".concat(interfaceName).concat(ip);
-                long count = sRedis.incr(key, 1L);
-                if (count == 1) {
-                    sRedis.expire(key, checkRequest.seconds(), TimeUnit.SECONDS);
-                }
-                if (count > checkRequest.maxCount()) {
-                    log.info("用户IP[" + ip + "]接口[" + interfaceName + "]超过了限定的次数[" + checkRequest.maxCount() + "]");
+                String uri = request.getRequestURI();
+                boolean status = ipLock(ip,uri,checkRequest.seconds(),checkRequest.maxCount());
+                if (!status){
+                    log.info("用户IP[" + ip + "]接口[" + uri + "]超过了限定的次数[" + checkRequest.maxCount() + "]");
                     throw new SException(GenericEnum.REPETITION_ERROR);
                 }
-                break;
-            }
-            case CODE_CHECK: {
-                if (!signGenerater.checkCode(bean.getCode(),request,bean.getUserSignal())){
-                    throw new SException(GenericEnum.SIGN_ERROR);
+                if (checkRequest.level() == CheckGradeEnum.LOCK_CHECK){
+                    if (!signGenerater.macthRule(bean.getUserSignal(),bean.getSign(),bean.getObject())){
+                        throw new SException(GenericEnum.SIGN_ERROR);
+                    }
                 }
                 break;
             }
             case SIGN_CHECK: {
-                if (!signGenerater.checkSign(bean.getCode(),bean.getSign())){
+                if (!signGenerater.macthSign(bean.getUserSignal(),bean.getSign())){
+                    throw new SException(GenericEnum.SIGN_ERROR);
+                }
+                break;
+            }
+            case HIGHLEVEL_SIGN_CHECK: {
+                if (!signGenerater.macthSignHighLevel(bean.getUserSignal(),bean.getSign(),bean.getObject())){
                     throw new SException(GenericEnum.SIGN_ERROR);
                 }
                 break;
@@ -107,5 +110,17 @@ public class CheckRequestContract extends BasicContract {
             default:
                 break;
         }
+    }
+
+    private boolean ipLock(String ip,String uri,Long time,Long maxCount){
+        String key = "REQ_LIMINT_".concat(uri).concat(ip);
+        long count = sRedis.incr(key, 1L);
+        if (count == 1) {
+            sRedis.expire(key, time, TimeUnit.SECONDS);
+        }
+        if (count > maxCount) {
+            return false;
+        }
+        return true;
     }
 }

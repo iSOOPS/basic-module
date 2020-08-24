@@ -2,138 +2,206 @@ package com.isoops.basicmodule.common.redis;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.isoops.basicmodule.common.redis.source.RedisLock;
-import com.isoops.basicmodule.common.redis.source.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Component
 public class SRedis {
 
     @Autowired
-    private RedisUtil redisUtil;
+    private StringRedisTemplate redisTemplate;
 
-    @Autowired
-    private RedisLock redisLock;
-
-    public void set(String key, Object obj) {
-        if (key == null || key.equals("") || obj == null){
-            return;
+    private boolean blank(Object...args){
+        for (Object temp:args){
+            if (temp == null || temp==""){
+                return true;
+            }
         }
-        redisUtil.set(key,(obj instanceof String) ? (String) obj : JSON.toJSONString(obj));
+        return false;
     }
 
-    public void set(String key, Object obj ,Integer seconds) {
-        if (key == null || key.equals("") || obj == null || seconds == null){
-            return;
-        }
-        redisUtil.setEx(key,(obj instanceof String) ? (String) obj : JSON.toJSONString(obj),seconds,TimeUnit.SECONDS);
+    public boolean set(String key, Object obj) {
+        return set(key,obj,null,null);
     }
 
-    public void set(String key, Object obj ,Long time,TimeUnit unit) {
-        if (key == null || key.equals("") || obj == null){
-            return;
-        }
-        if (time == null || unit == null){
-            set(key,obj);
-            return;
-        }
-        redisUtil.setEx(key,(obj instanceof String) ? (String) obj : JSON.toJSONString(obj),time,unit);
+    public boolean set(String key, Object obj ,Long seconds) {
+        return set(key,obj, seconds,TimeUnit.SECONDS);
     }
 
-
+    public boolean set(String key, Object obj ,Long time,TimeUnit unit) {
+        if (blank(key,obj,time,unit)){
+            return false;
+        }
+        try {
+            if (time == null || unit == null){
+                redisTemplate.opsForValue().set(key, (obj instanceof String) ? (String) obj : JSON.toJSONString(obj));
+            }
+            else {
+                redisTemplate.opsForValue().set(key, (obj instanceof String) ? (String) obj : JSON.toJSONString(obj), time, unit);
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     public String get(String key){
-        if (key == null || key.equals("")){
+        if (blank(key)){
             return null;
         }
-        return redisUtil.get(key);
+        return redisTemplate.opsForValue().get(key);
     }
 
     public <T>T get(String key, Class<T> tClass){
-        if (key == null || key.equals("") || tClass == String.class){
+        if (blank(key) || tClass == String.class){
             return null;
         }
-        String value = redisUtil.get(key);
+        String value = redisTemplate.opsForValue().get(key);
         if (value == null){
             return null;
         }
         return JSON.parseObject(value,tClass);
     }
-
-    public <T>List<T> getList(String key, Class<T> tClass){
-        if (key == null || key.equals("")){
+    public <T>List<T> get(Collection<String> keys, Class<T> tClass) {
+        if (blank(keys) || keys.size()<1){
             return null;
         }
-        String value = redisUtil.get(key);
+        List<String> strings = redisTemplate.opsForValue().multiGet(keys);
+        List<T> response = new ArrayList<>();
+        if (strings != null) {
+            for (String json : strings){
+                response.add(JSON.parseObject(json,tClass));
+            }
+        }
+        return response;
+    }
+
+    public <T>List<T> getList(String key, Class<T> tClass){
+        if (blank(key)){
+            return null;
+        }
+        String value = redisTemplate.opsForValue().get(key);
         return JSONArray.parseArray(value,tClass);
     }
 
-    public void delete(String key) {
-        redisUtil.delete(key);
+    public boolean delete(String key) {
+        if (blank(key)){
+            return false;
+        }
+        try {
+            redisTemplate.delete(key);
+            return true;
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
     }
 
-    public void delete(String ...arg) {
+    public boolean delete(String ...arg) {
         List<String> list = Arrays.asList(arg);
-        redisUtil.delete(list);
+        if (list.size()<1){
+            return false;
+        }
+        try {
+            redisTemplate.delete(list);
+            return true;
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
     }
 
     /**
      * 增加(自增长), 负数则为自减
      */
-    public Long incr(String key,Long count){
-        return redisUtil.incrBy(key,count);
+    public Long incr(String key,Long increment){
+        if (blank(key,increment)){
+            return null;
+        }
+        return redisTemplate.opsForValue().increment(key, increment);
     }
 
+    /**
+     * 设置过期时间
+     */
     public boolean expire(String key,Long time,TimeUnit unit){
-        return redisUtil.expire(key,time,unit);
+        if (blank(key,time,unit)){
+            return false;
+        }
+        try {
+            return redisTemplate.expire(key,time,unit);
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
     }
 
+    /**
+     * 移除 key 的过期时间，key 将持久保持
+     */
+    public Boolean persist(String key) {
+        if (blank(key)){
+            return false;
+        }
+        return redisTemplate.persist(key);
+    }
+
+    /**
+     * 返回 key 的剩余的过期时间
+     */
+    public Long getExpire(String key, TimeUnit unit) {
+        if (blank(key,unit)){
+            return null;
+        }
+        return redisTemplate.getExpire(key, unit);
+    }
 
     /**
      * 检查key是否存在
      */
-    public boolean checkKey(String key) {
-        return redisUtil.hasKey(key);
+    public boolean hasKey(String key) {
+        if (blank(key)){
+            return false;
+        }
+        return redisTemplate.hasKey(key);
     }
-
-    private static String LOCKKEYREDIS = "LOCKKEYREDIS_";
 
     /**
-     * 该加锁方法仅针对单实例 Redis 可实现分布式加锁
-     * 锁key-手动UUID
+     * 查找匹配的key
      */
-    public boolean lockKeyWithUUID(String key,String uuid,Integer seconds){
-        set(LOCKKEYREDIS+key,uuid,seconds);
-        return redisLock.lock(key,uuid,seconds);
+    public Set<String> getKeys(String pattern) {
+        if (blank(pattern)){
+            return null;
+        }
+        return redisTemplate.keys(pattern);
     }
+
+
 
     /**
      * 该加锁方法仅针对单实例 Redis 可实现分布式加锁 /当key不存在当时候才会成功
-     * 锁key-自动UUID
      */
-    public boolean lockKey(String key,Integer seconds){
-        String uuid = UUID.randomUUID().toString();
-        //去掉“-”符号
-        uuid = uuid.substring(0,8)+uuid.substring(9,13)+uuid.substring(14,18)+uuid.substring(19,23)+uuid.substring(24);
-        return lockKeyWithUUID(key,uuid,seconds);
+    public boolean setnx(String key ,String value ,Long time,TimeUnit unit){
+        if (blank(key,value,time,unit)){
+            return false;
+        }
+        return redisTemplate.opsForValue().setIfAbsent(key, value, time, unit);
     }
 
     /**
      * 该加锁方法仅针对单实例 Redis 可实现分布式加锁
      * 解锁key
      */
-    public boolean unLockKey(String key){
-        String uuid = get(LOCKKEYREDIS+key,String.class);
-        if (uuid!=null){
-            return redisLock.unLock(key);
+    public boolean deletenx(String key){
+        if (blank(key)){
+            return false;
         }
-        return false;
+        return redisTemplate.opsForValue().getOperations().delete(key);
     }
 
 }

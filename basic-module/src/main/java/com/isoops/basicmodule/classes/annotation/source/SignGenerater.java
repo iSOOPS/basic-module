@@ -1,9 +1,14 @@
 package com.isoops.basicmodule.classes.annotation.source;
 
+import com.alibaba.fastjson.JSON;
+import com.isoops.basicmodule.source.SClass;
 import com.isoops.basicmodule.source.SMD5;
 import com.isoops.basicmodule.source.SUUIDGenerater;
 import com.isoops.basicmodule.common.redis.SRedis;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,58 +18,81 @@ import java.util.concurrent.TimeUnit;
 public class SignGenerater {
 
     @Autowired
-    private SRedis sRedis;
+    private SRedis redis;
 
-    /**
-     * 创建一个sign（使用redis存储并且启动非redis分布式的锁/默认2个小时失效）
-     * @param code code
-     * @param validityTime 有效时间-值
-     * @param unit 有效时间单位
-     * @return f
-     */
-    public String signCreater(String code, Long validityTime, TimeUnit unit){
-        if (code == null || code.equals("")){
-            return null;
-        }
-        validityTime = validityTime == null ? 2 : validityTime;
-        unit = unit == null ? TimeUnit.HOURS : unit;
-        String uuid = SUUIDGenerater.getCleanUUID();
-        sRedis.lockKeyWithUUID(code,uuid, 15);
-        sRedis.set(code,uuid,validityTime,unit);
-        return uuid;
+    private static String SIGNRECORD = "SIGNRECORD_";
+
+    public String bcryptEncode(String key){
+        BCryptPasswordEncoder encoder =new BCryptPasswordEncoder();
+        return encoder.encode(key);
+    }
+
+    public boolean match(String key,String source){
+        BCryptPasswordEncoder encoder =new BCryptPasswordEncoder();
+        return encoder.matches(key,source);
     }
 
     /**
      * 创建一个code
-     * @param request 请求头.replace(".","")
      * @param userSignal 用户的标示
      * @return f
      */
-    public String codeCreater(HttpServletRequest request, String userSignal){
-        String ip = request.getRemoteAddr().replace(".","").replace(":","");
-        String codeBasic = userSignal+ip;
-        return SMD5.enCode2MD5(codeBasic);
+    public String codeCreater(String userSignal, Long validityTime, TimeUnit unit){
+        String ramdomString = SClass.random(6,SClass.RAMDOMTYPE.LETTER_ALL,true);
+        String codeBasic = userSignal + ramdomString;
+        String md5Code = SMD5.enCode2MD5(codeBasic);
+        boolean statue = redis.set(SIGNRECORD + userSignal,md5Code,validityTime,unit);
+        return statue ? md5Code : null;
     }
 
-    public boolean checkCode(String code, HttpServletRequest request, String userSignal){
-        return codeCreater(request, userSignal).equals(code);
+    public boolean macthRule(String userSignal ,String sign, Object obj){
+        if (userSignal == null || userSignal.equals("") ||
+                sign == null || sign.equals("") ||
+                obj == null){
+            return false;
+        }
+        String objectJson = JSON.toJSONString(obj);
+        return match(userSignal + objectJson,sign);
     }
 
     /**
      * 校验sign是否正确
-     * @param code code
-     * @param sign sign
      * @return f
      */
-    public boolean checkSign(String code,String sign){
-        if (!sRedis.checkKey(code)){
+    public boolean macthSign(String userSignal ,String sign){
+        if (userSignal == null || userSignal.equals("") ||
+                sign == null || sign.equals("")){
             return false;
         }
-        return sign.equals(sRedis.get(code));
+        if (!redis.hasKey(userSignal)){
+            return false;
+        }
+        String code = redis.get(SIGNRECORD + userSignal);
+        if (code == null || code.equals("")){
+            return false;
+        }
+        return match(userSignal + code,sign);
     }
 
-    public boolean cleanSign(String code){
-        sRedis.delete(code);
+    public boolean macthSignHighLevel(String userSignal , String sign, Object obj){
+        if (userSignal == null || userSignal.equals("") ||
+                sign == null || sign.equals("") ||
+                obj == null){
+            return false;
+        }
+        if (!redis.hasKey(userSignal)){
+            return false;
+        }
+        String code = redis.get(SIGNRECORD + userSignal);
+        if (code == null || code.equals("")){
+            return false;
+        }
+        String objectJson = JSON.toJSONString(obj);
+        return match(userSignal + code + objectJson,sign);
+    }
+
+    public boolean cleanSign(String userSignal){
+        redis.delete(userSignal);
         return true;
     }
 }

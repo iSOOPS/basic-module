@@ -15,10 +15,6 @@ import java.io.Serializable;
 @Data
 public class Request<T> implements Serializable {
 
-    @ApiModelProperty(value = "加密签名key码", required = true)
-    @NotBlank(message = "code不能为空")
-    private String code;
-
     @ApiModelProperty(value = "加密签名", required = true)
     @NotBlank(message = "sign不能为空")
     private String sign;
