@@ -23,9 +23,6 @@ public class BasicContract {
         Enumeration<String> enu = request.getParameterNames();
         while (enu.hasMoreElements()) {
             String paraName = enu.nextElement();
-            if (paraName.equals("code")){
-                bean.setCode(request.getParameter(paraName));
-            }
             if (paraName.equals("sign")){
                 bean.setSign(request.getParameter(paraName));
             }
