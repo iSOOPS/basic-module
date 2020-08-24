@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.isoops</groupId>
 	<artifactId>basic-module</artifactId>
-	<version>2.2.2.RELASE</version>
+	<version>2.2.2.RELEASE</version>
 	<name>basic-module</name>
 	<description>basic-module project for Spring Boot</description>
 
