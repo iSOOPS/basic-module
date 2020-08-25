@@ -33,7 +33,6 @@ public class SpringBootGlobalUtil implements ApplicationContextAware {
         try {
             o = getApplicationContext().getBean(name);
         } catch (NoSuchBeanDefinitionException e) {
-            // e.printStackTrace();
         }
         return o;
     }

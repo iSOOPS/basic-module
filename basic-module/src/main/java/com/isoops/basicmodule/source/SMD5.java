@@ -19,7 +19,6 @@ public class SMD5 {
             md5 = MessageDigest.getInstance("MD5");
         }catch (Exception e){
             System.out.println(e.toString());
-            e.printStackTrace();
             return "";
         }
         char[] charArray = inStr.toCharArray();

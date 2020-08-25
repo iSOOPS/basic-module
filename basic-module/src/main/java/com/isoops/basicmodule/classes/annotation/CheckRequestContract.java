@@ -1,7 +1,6 @@
 package com.isoops.basicmodule.classes.annotation;
 
 import com.isoops.basicmodule.classes.annotation.source.BasicContract;
-import com.isoops.basicmodule.classes.annotation.source.CheckGradeEnum;
 import com.isoops.basicmodule.classes.interceptor.SException;
 import com.isoops.basicmodule.classes.basicmodel.GenericEnum;
 import com.isoops.basicmodule.classes.basicmodel.Request;
@@ -79,8 +78,7 @@ public class CheckRequestContract extends BasicContract {
             case NO_CHECK:{
                 break;
             }
-            case LOCK:
-            case LOCK_CHECK:{
+            case LOCK:{
                 String ip = GetIpAddr(request);
                 String uri = request.getRequestURI();
                 boolean status = ipLock(ip,uri,checkRequest.seconds(),checkRequest.maxCount());
@@ -88,21 +86,10 @@ public class CheckRequestContract extends BasicContract {
                     log.info("用户IP[" + ip + "]接口[" + uri + "]超过了限定的次数[" + checkRequest.maxCount() + "]");
                     throw new SException(GenericEnum.REPETITION_ERROR);
                 }
-                if (checkRequest.level() == CheckGradeEnum.LOCK_CHECK){
-                    if (!signGenerater.macthRule(bean.getUserSignal(),bean.getSign(),bean.getObject())){
-                        throw new SException(GenericEnum.SIGN_ERROR);
-                    }
-                }
                 break;
             }
             case SIGN_CHECK: {
                 if (!signGenerater.macthSign(bean.getUserSignal(),bean.getSign())){
-                    throw new SException(GenericEnum.SIGN_ERROR);
-                }
-                break;
-            }
-            case HIGHLEVEL_SIGN_CHECK: {
-                if (!signGenerater.macthSignHighLevel(bean.getUserSignal(),bean.getSign(),bean.getObject())){
                     throw new SException(GenericEnum.SIGN_ERROR);
                 }
                 break;

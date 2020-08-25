@@ -58,7 +58,7 @@ public class SResponseHandle implements ResponseBodyAdvice<Object> {
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public Response<?> handleRuntimeException(Exception exception) {
-
+        log.info("ERROR:"+exception);
         if (exception.getCause() instanceof SException){
             SException sException = (SException) exception.getCause();
             if (sException.getGenericEnum()!=null){
