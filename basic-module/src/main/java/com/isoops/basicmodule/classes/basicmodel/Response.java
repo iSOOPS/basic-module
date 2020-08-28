@@ -34,6 +34,9 @@ public class Response<T> implements Serializable {
     @ApiModelProperty(value = "分页总数量")
     private Long pageCount;
 
+    @ApiModelProperty(value = "总数量")
+    private Long totalCount;
+
     @ApiModelProperty(value = "返回对象")
     private T object;
 
@@ -67,6 +70,7 @@ public class Response<T> implements Serializable {
     public Response<T> toPage(IPage<?> page){
         this.pageCount = page.getPages();
         this.haveNext = (page.getCurrent() + 1) <= page.getPages();
+        this.totalCount = page.getTotal();
         return this;
     }
 }

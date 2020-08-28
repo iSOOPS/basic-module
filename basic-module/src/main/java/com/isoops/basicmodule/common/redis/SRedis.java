@@ -33,7 +33,7 @@ public class SRedis {
     }
 
     public boolean set(String key, Object obj ,Long time,TimeUnit unit) {
-        if (blank(key,obj,time,unit)){
+        if (blank(key,obj)){
             return false;
         }
         try {

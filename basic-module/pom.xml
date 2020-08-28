@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.isoops</groupId>
 	<artifactId>basic-module</artifactId>
-	<version>2.2.5.RELEASE</version>
+	<version>2.2.7.RELEASE</version>
 	<name>basic-module</name>
 	<description>basic-module project for Spring Boot</description>
 
@@ -134,7 +134,7 @@
             <version>4.5.10</version>
         </dependency>
 
-         <!--https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-boot-starter-->
+<!--         &lt;!&ndash;https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-boot-starter&ndash;&gt;-->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
@@ -193,14 +193,19 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.junit.vintage</groupId>
-					<artifactId>junit-vintage-engine</artifactId>
-				</exclusion>
-			</exclusions>
+<!--			<exclusions>-->
+<!--				<exclusion>-->
+<!--					<groupId>org.junit.vintage</groupId>-->
+<!--					<artifactId>junit-vintage-engine</artifactId>-->
+<!--				</exclusion>-->
+<!--			</exclusions>-->
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
 	<build>
         <finalName>${artifactId}</finalName>

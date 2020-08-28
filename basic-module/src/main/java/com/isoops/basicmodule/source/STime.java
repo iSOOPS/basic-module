@@ -7,6 +7,11 @@ import java.util.Date;
 
 public class STime {
 
+    private static final long YAR = 365 * 24 * 60 * 60;
+    private static final long DAY  = 24 * 60 * 60;
+    private static final long HOU = 60 * 60;
+    private static final long MIN  = 60;
+
     /**
      * date 转 LocalDateTime
      */
@@ -60,6 +65,44 @@ public class STime {
         return time.format(DateTimeFormatter.ofPattern(pattern));
     }
 
+    private static String getFormatName(long defaultTime){
+        if (defaultTime == YAR){
+            return "年";
+        }
+        else if (defaultTime == DAY){
+            return "天";
+        }
+        else if (defaultTime == HOU){
+            return "小时";
+        }
+        else if (defaultTime == MIN){
+            return "分";
+        }
+        else{
+            return "秒";
+        }
+    }
+
+    private static String formatString(Long lastMill, long defaultTime){
+        long t = (lastMill - (lastMill % defaultTime != lastMill ? lastMill % defaultTime : 0 ))  / defaultTime;
+        return t !=0 ? t + getFormatName(defaultTime) : "";
+    }
+
+    public static String formatTimeMill(Long timeMill) {
+        long lastMill = timeMill;
+
+        String year = formatString(lastMill,YAR);
+        lastMill = lastMill % YAR;
+        String day = formatString(lastMill,DAY);
+        lastMill = lastMill % DAY;
+        String hou = formatString(lastMill,HOU);
+        lastMill = lastMill % HOU;
+        String min = formatString(lastMill,MIN);
+        lastMill = lastMill % MIN;
+        String sen = lastMill !=0 ? lastMill + getFormatName(lastMill) : "";
+
+        return year + day + hou + min + sen;
+    }
     /**
      * 修改时间的值
      * @param time 时间
@@ -123,4 +166,6 @@ public class STime {
                 return null;
         }
     }
+
+
 }
