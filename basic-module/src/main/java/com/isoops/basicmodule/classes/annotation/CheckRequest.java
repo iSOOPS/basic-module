@@ -3,6 +3,7 @@ package com.isoops.basicmodule.classes.annotation;
 
 
 import com.isoops.basicmodule.classes.annotation.source.CheckGradeEnum;
+import com.isoops.basicmodule.classes.annotation.source.CheckGradeType;
 
 import java.lang.annotation.*;
 
@@ -20,6 +21,11 @@ public @interface CheckRequest {
      * 校验等级
      */
     CheckGradeEnum level() default CheckGradeEnum.SIGN_CHECK;
+
+    /**
+     * 校验类型
+     */
+    CheckGradeType type() default CheckGradeType.BODY;
 
     /**
      * 接口请求锁-请求间隔

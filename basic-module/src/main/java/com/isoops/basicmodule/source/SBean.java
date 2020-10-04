@@ -1,13 +1,16 @@
 package com.isoops.basicmodule.source;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.invoke.SerializedLambda;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.google.common.collect.Maps;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.cglib.beans.BeanMap;
@@ -163,11 +166,11 @@ public class SBean {
     /**
      * 替换map中null成空字符串
      */
-    public static Map<String,Object> replaceNullToEmpty(Map<String,Object> map){
+    public static Map<String,Object> replaceNullToSomething(Map<String,Object> map,Object something){
         Set<Map.Entry<String, Object>> entries = map.entrySet();
         for (Map.Entry<String,Object> entry:entries){
             if (entry.getValue() == null){
-                entry.setValue("");
+                entry.setValue(something);
             }
         }
         return map;
@@ -176,20 +179,72 @@ public class SBean {
     /**
      * 获取数组里对象的某个字段，重新组成数组
      */
-    public static<T> List<T> getValueToList(List<?> basicList, String key) {
-        List<T> resultList = new ArrayList<>();
+    public static<T,V> List<V> getValueToList(List<T> basicList, SFunction<T,V> key) {
+        List<V> resultList = new ArrayList<>();
         if (basicList == null) {
             return resultList;
         }
-        Type type = ((ParameterizedType)resultList.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-        for (Object obj : basicList) {
-            Map<String, Object> map = SBean.beanToMap(obj);
-            if (map.get(key)!=null && map.get(key).getClass() == type){
-                T objs = (T) map.get(key);
-                resultList.add(objs);
-            }
+        for (T o : basicList) {
+            V val = key.apply(o);
+            resultList.add(val);
         }
         return resultList;
+    }
+
+    /**
+     * 获取数组里对象的某个字段，重新组成数组
+     */
+    public static<T,V> void setValueToList(List<T> basicList, SFunction<T,V> key , V object) {
+        if (basicList == null) {
+            return;
+        }
+        for (T o : basicList) {
+            String keyName = getLambdaName(key);
+            try {
+                BeanUtils.setProperty(o,keyName,object);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static <T> String getLambdaName(SFunction<T, ?> fn) {
+        // 从function取出序列化方法
+        Method writeReplaceMethod;
+        try {
+            writeReplaceMethod = fn.getClass().getDeclaredMethod("writeReplace");
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+
+        // 从序列化方法取出序列化的lambda信息
+        boolean isAccessible = writeReplaceMethod.isAccessible();
+        writeReplaceMethod.setAccessible(true);
+        SerializedLambda serializedLambda;
+        try {
+            serializedLambda = (SerializedLambda) writeReplaceMethod.invoke(fn);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+        writeReplaceMethod.setAccessible(isAccessible);
+
+        // 从lambda信息取出method、field、class等
+        String fieldName = serializedLambda.getImplMethodName().substring("get".length());
+        fieldName = fieldName.replaceFirst(fieldName.charAt(0) + "", (fieldName.charAt(0) + "").toLowerCase());
+        Field field;
+        try {
+            field = Class.forName(serializedLambda.getImplClass().replace("/", ".")).getDeclaredField(fieldName);
+        } catch (ClassNotFoundException | NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
+
+        // 从field取出字段名，可以根据实际情况调整
+        TableField tableField = field.getAnnotation(TableField.class);
+        if (tableField != null && tableField.value().length() > 0) {
+            return tableField.value();
+        } else {
+            return fieldName.replaceAll("[A-Z]", "_$0").toLowerCase();
+        }
     }
 
     /**

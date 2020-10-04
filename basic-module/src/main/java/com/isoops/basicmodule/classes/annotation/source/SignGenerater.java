@@ -59,7 +59,11 @@ public class SignGenerater {
     }
 
     public boolean cleanSign(String userSignal){
-        redis.delete(userSignal);
+        redis.delete(SIGNRECORD + userSignal);
         return true;
+    }
+
+    public String getSign(String userSignal){
+        return redis.get(SIGNRECORD + userSignal);
     }
 }

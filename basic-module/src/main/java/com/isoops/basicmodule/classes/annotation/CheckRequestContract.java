@@ -1,6 +1,7 @@
 package com.isoops.basicmodule.classes.annotation;
 
 import com.isoops.basicmodule.classes.annotation.source.BasicContract;
+import com.isoops.basicmodule.classes.annotation.source.CheckGradeType;
 import com.isoops.basicmodule.classes.interceptor.SException;
 import com.isoops.basicmodule.classes.basicmodel.GenericEnum;
 import com.isoops.basicmodule.classes.basicmodel.Request;
@@ -58,9 +59,17 @@ public class CheckRequestContract extends BasicContract {
         Method method = ((MethodSignature) proceedingJoinPoint.getSignature()).getMethod();
         CheckRequest checkRequest = method.getAnnotation(CheckRequest.class);
 
+        switch (checkRequest.type()){
+            case BODY:{
+                Request<?> bean = checkRequest.isUrl() ? GetArgsWithUrl(request) : GetArgsModel(proceedingJoinPoint);
+                checkAction(request,bean,checkRequest);
+                break;
+            }
+            case URL:{
 
-        Request<?> bean = checkRequest.isUrl() ? GetArgsWithUrl(request) : GetArgsModel(proceedingJoinPoint);
-        checkAction(request,bean,checkRequest);
+                break;
+            }
+        }
 
         String rui = request.getRequestURI();
         SResponseUriCache.getInstance().set(rui, true);

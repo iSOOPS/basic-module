@@ -2,7 +2,11 @@ package com.isoops.basicmodule.common.redis;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.isoops.basicmodule.source.SBean;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +36,7 @@ public class SRedis {
         return set(key,obj, seconds,TimeUnit.SECONDS);
     }
 
-    public boolean set(String key, Object obj ,Long time,TimeUnit unit) {
+    private boolean set(String key, Object obj ,Long time,TimeUnit unit) {
         if (blank(key,obj)){
             return false;
         }
@@ -116,6 +120,18 @@ public class SRedis {
         }
     }
 
+    public boolean delete(List<String> list) {
+        if (null == list || list.size()<1){
+            return false;
+        }
+        try {
+            redisTemplate.delete(list);
+            return true;
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
     /**
      * 增加(自增长), 负数则为自减
      */

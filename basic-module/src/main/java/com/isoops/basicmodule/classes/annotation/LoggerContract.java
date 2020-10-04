@@ -28,13 +28,15 @@ public class LoggerContract extends BasicContract {
 
     @Around("log() && @annotation(req)")
     public Object doAround(ProceedingJoinPoint joinPoint, final Logger req) throws Throwable {
-        long startTime=System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
         Object result = joinPoint.proceed();
         log.info("==================START RESPONSE[Desc:+"+ req.msg() +"]=================");
         if (req.logType() != LoggerEnum.ONLY_REQUEST) {
             log.info("RESPONSE:"+JSON.toJSONString(result));
         }
-        log.info("TIME:"+(System.currentTimeMillis()-startTime)/1000+"/s");
+        long endTime = System.currentTimeMillis();
+        long usedTime = endTime - startTime;
+        log.info("USED-TIME:" + usedTime + "/ms");
         return result;
     }
 

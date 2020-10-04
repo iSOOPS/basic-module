@@ -23,17 +23,6 @@ public class SClass{
 
     private static final Pattern numberPattern = Pattern.compile("-?[0-9]+.?[0-9]+");
 
-    public static Integer getPageSizeCount(Integer allCount,Integer pageSize){
-        if (allCount==null || pageSize == null){
-            return 0;
-        }
-        float i = allCount % pageSize;
-        if (i ==0){
-            return allCount / pageSize;
-        }
-        return allCount / pageSize+1;
-    }
-
     public static boolean isNotBlank(Object...args){
         return !isBlank(args);
     }
@@ -57,6 +46,20 @@ public class SClass{
             }
         }
         return false;
+    }
+
+    public static String mergeBySeparator(String separator,Object...args) {
+        if (args == null || args.length < 1){
+            return null;
+        }
+        if (args.length == 1){
+            return String.valueOf(args[0]);
+        }
+        StringBuilder builder = new StringBuilder();
+        for (Object temp:args){
+            builder.append(temp).append(separator);
+        }
+        return builder.deleteCharAt(builder.length()-1).toString();
     }
 
     public static class RAMDOMTYPE {
